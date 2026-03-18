@@ -312,12 +312,24 @@ export default function Home() {
               </button>
             ))}
           </nav>
-          <button
-            onClick={() => setLocation("/chat")}
-            className="btn-primary text-[13px] px-5 py-2"
-          >
-            免费检测
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setLocation("/chat")}
+              className="btn-primary text-[13px] px-5 py-2"
+            >
+              免费检测
+            </button>
+            <button
+              onClick={() => setLocation("/profile")}
+              className="w-9 h-9 rounded-full flex items-center justify-center bg-[rgba(193,123,92,0.08)] hover:bg-[rgba(193,123,92,0.15)] transition-all hover:scale-105"
+              title="个人中心"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </button>
+          </div>
         </header>
 
         {/* Desktop Main Content */}

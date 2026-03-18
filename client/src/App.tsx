@@ -10,6 +10,7 @@ import Result from "./pages/Result";
 import Calendar from "./pages/Calendar";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
+import Login from "./pages/Login";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/calendar" component={Calendar} />
       <Route path="/history" component={History} />
       <Route path="/profile" component={Profile} />
+      <Route path="/login" component={Login} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
