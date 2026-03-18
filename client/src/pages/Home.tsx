@@ -1,8 +1,8 @@
 /*
- * Home.tsx — 首页（移动端合并检测入口）
+ * Home.tsx — 首页
  * Design: Warm Ivory Minimalism
  * 
- * 移动端：紧凑 hero + 上传区 + 快捷问题 + TabBar（一站式体验）
+ * 移动端：无 hero 图片，紧凑上传区 + 6维度标签 + 快捷提问胶囊 + 小统计
  * 桌面端：保留左文右图不对称布局 + 浮动卡片
  */
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -14,18 +14,19 @@ import MobileTabBar from "@/components/MobileTabBar";
 const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663449767573/9NFV4vPhGYnrkNfpEcCSrd/hero-face-KvC8ByCEeL23Hap2YwZiKi.webp";
 
 const metrics = [
-  { label: "水分", value: 88 },
-  { label: "油脂", value: 72 },
-  { label: "色素", value: 65 },
-  { label: "毛孔", value: 58 },
-  { label: "亮度", value: 78 },
-  { label: "弹性", value: 91 },
+  { label: "水分", value: 88, icon: "💧" },
+  { label: "油脂", value: 72, icon: "🫧" },
+  { label: "色素", value: 65, icon: "🎨" },
+  { label: "毛孔", value: 58, icon: "🔬" },
+  { label: "亮度", value: 78, icon: "✨" },
+  { label: "弹性", value: 91, icon: "🌿" },
 ];
 
 const quickQuestions = [
-  "我的皮肤适合什么护肤品？",
-  "如何改善毛孔粗大？",
-  "敏感肌日常护理建议",
+  "适合什么护肤品？",
+  "改善毛孔粗大",
+  "敏感肌护理",
+  "美白淡斑方法",
 ];
 
 function useCountUp(target: number, duration = 1200) {
@@ -56,8 +57,6 @@ export default function Home() {
   const handleImageUpload = useCallback(
     (file: File) => {
       if (!file.type.startsWith("image/")) return;
-      // Navigate to chat with the file info
-      // Store file temporarily and go to chat
       setLocation("/chat");
     },
     [setLocation]
@@ -138,115 +137,167 @@ export default function Home() {
           </button>
         </header>
 
-        {/* Mobile Hero - Compact */}
-        <div className="relative mx-4 rounded-2xl overflow-hidden mb-5 anim-fade-up" style={{ height: 200 }}>
-          <img
-            src={HERO_IMAGE}
-            alt="皮肤分析"
-            className="w-full h-full object-cover object-top"
-            style={{ filter: "brightness(0.85)" }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(45,36,32,0.7) 0%, rgba(45,36,32,0.1) 50%, transparent 100%)" }}
-          />
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-body font-medium bg-[rgba(255,255,255,0.2)] text-white backdrop-blur-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C17B5C]" />
-                AI 皮肤智能分析
-              </span>
-            </div>
-            <h1 className="font-display text-[1.6rem] font-light leading-tight text-white">
-              了解你的<span className="text-[#E8B4A0]">皮肤状态</span>
-            </h1>
-            <p className="font-body text-[12px] text-white/70 mt-1.5 leading-relaxed" style={{ fontWeight: 300 }}>
-              上传照片，30 秒获得 6 维度专业分析报告
-            </p>
-          </div>
+        {/* Greeting + Upload CTA */}
+        <div className="px-5 pt-2 pb-4 anim-fade-up">
+          <h1 className="font-display text-[1.5rem] font-light text-[#2D2420] leading-tight">
+            你好，<span className="text-clay-gradient">开始检测</span>
+          </h1>
+          <p className="font-body text-[12px] text-[#9A8C82] mt-1" style={{ fontWeight: 300 }}>
+            上传照片，AI 30 秒生成专业分析报告
+          </p>
         </div>
 
-        {/* Mobile Upload Area */}
+        {/* Upload Card - prominent but compact */}
         <div className="px-4 mb-4 anim-fade-up d-100">
           <div
-            className="relative border-2 border-dashed border-[rgba(193,123,92,0.25)] rounded-xl p-5 text-center cursor-pointer hover:border-[rgba(193,123,92,0.5)] hover:bg-[rgba(193,123,92,0.03)] transition-all active:scale-[0.98]"
+            className="relative rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
             onClick={() => fileInputRef.current?.click()}
+            style={{
+              background: "linear-gradient(135deg, rgba(193,123,92,0.08) 0%, rgba(193,123,92,0.03) 100%)",
+              border: "1.5px solid rgba(193,123,92,0.15)",
+            }}
           >
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-[rgba(193,123,92,0.1)] flex items-center justify-center shrink-0">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <div className="flex items-center gap-4 p-4">
+              {/* Camera icon circle */}
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                style={{
+                  background: "linear-gradient(135deg, #C17B5C 0%, #D4956F 100%)",
+                  boxShadow: "0 4px 12px rgba(193,123,92,0.3)",
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
               </div>
-              <div className="text-left">
-                <p className="font-body text-sm font-medium text-[#2D2420]">上传面部照片开始检测</p>
-                <p className="font-body text-[11px] text-[#B5ADA7] mt-0.5">支持 JPG、PNG，建议正面清晰照片</p>
+              <div className="flex-1">
+                <p className="font-body text-[14px] font-medium text-[#2D2420]">拍照 / 上传面部照片</p>
+                <p className="font-body text-[11px] text-[#B5ADA7] mt-0.5">正面清晰照片效果最佳</p>
               </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-50">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </div>
           </div>
         </div>
 
-        {/* Mobile Quick Questions */}
-        <div className="px-4 mb-5 anim-fade-up d-200">
-          <p className="font-body text-[11px] text-[#B5ADA7] uppercase tracking-wider mb-2.5">快捷提问</p>
-          <div className="flex flex-col gap-2">
+        {/* 6 Dimension Badges - horizontal scroll */}
+        <div className="px-4 mb-4 anim-fade-up d-150">
+          <div className="flex items-center gap-1.5 mb-2.5">
+            <span className="font-body text-[11px] text-[#B5ADA7] tracking-wider">6 维度智能分析</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {metrics.map((m) => (
+              <div
+                key={m.label}
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg"
+                style={{
+                  background: "rgba(253,250,247,0.8)",
+                  border: "1px solid rgba(45,36,32,0.05)",
+                }}
+              >
+                <span className="text-[12px]">{m.icon}</span>
+                <span className="font-body text-[11px] text-[#5A4F49]">{m.label}</span>
+                <span className="font-body text-[11px] text-[#C17B5C] font-medium ml-auto">{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Questions - horizontal pill scroll */}
+        <div className="px-4 mb-4 anim-fade-up d-200">
+          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-2">快捷提问</p>
+          <div className="flex flex-wrap gap-2">
             {quickQuestions.map((q) => (
               <button
                 key={q}
                 onClick={() => setLocation("/chat")}
-                className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[rgba(253,250,247,0.8)] border border-[rgba(45,36,32,0.06)] text-left hover:bg-[rgba(193,123,92,0.06)] transition-all active:scale-[0.98]"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-body text-[#5A4F49] hover:text-[#C17B5C] transition-colors active:scale-[0.96]"
+                style={{
+                  background: "rgba(253,250,247,0.8)",
+                  border: "1px solid rgba(45,36,32,0.06)",
+                }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-60">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-50 shrink-0">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
-                <span className="font-body text-[13px] text-[#5A4F49]">{q}</span>
+                {q}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Mobile Stats Row */}
-        <div className="px-4 mb-5 anim-fade-up d-300">
-          <div className="flex items-center justify-around py-4 rounded-xl bg-[rgba(253,250,247,0.8)] border border-[rgba(45,36,32,0.06)]">
-            {[
-              { num: "98%", label: "准确率" },
-              { num: "30s", label: "出结果" },
-              { num: "12+", label: "检测维度" },
-            ].map((stat, i) => (
-              <div key={stat.label} className="flex flex-col items-center">
-                <span className="font-display text-lg font-light text-[#2D2420]">{stat.num}</span>
-                <span className="font-body text-[10px] text-[#B5ADA7] mt-0.5">{stat.label}</span>
-                {i < 2 && <div className="absolute" />}
-              </div>
-            ))}
+        {/* Compact Stats + Quick Links Row */}
+        <div className="px-4 mb-4 anim-fade-up d-250">
+          <div className="flex gap-2">
+            {/* Stats mini card */}
+            <div
+              className="flex-1 flex items-center justify-around py-2.5 rounded-xl"
+              style={{
+                background: "rgba(253,250,247,0.8)",
+                border: "1px solid rgba(45,36,32,0.05)",
+              }}
+            >
+              {[
+                { num: "98%", label: "准确率" },
+                { num: "30s", label: "出结果" },
+                { num: "6", label: "维度" },
+              ].map((stat, i) => (
+                <div key={stat.label} className="flex flex-col items-center px-2">
+                  <span className="font-display text-[14px] font-light text-[#2D2420]">{stat.num}</span>
+                  <span className="font-body text-[9px] text-[#B5ADA7]">{stat.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Mobile Quick Links */}
-        <div className="px-4 mb-6 anim-fade-up d-400">
-          <div className="flex gap-3">
+        {/* Quick Nav Buttons */}
+        <div className="px-4 mb-6 anim-fade-up d-300">
+          <div className="flex gap-2">
             <button
               onClick={() => setLocation("/calendar")}
-              className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl bg-[rgba(253,250,247,0.8)] border border-[rgba(45,36,32,0.06)] hover:bg-[rgba(193,123,92,0.06)] transition-all active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl transition-all active:scale-[0.97]"
+              style={{
+                background: "rgba(253,250,247,0.8)",
+                border: "1px solid rgba(45,36,32,0.05)",
+              }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                 <line x1="16" y1="2" x2="16" y2="6" />
                 <line x1="8" y1="2" x2="8" y2="6" />
                 <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
-              <span className="font-body text-[13px] text-[#5A4F49]">护肤日历</span>
+              <span className="font-body text-[12px] text-[#5A4F49]">护肤日历</span>
             </button>
             <button
               onClick={() => setLocation("/history")}
-              className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl bg-[rgba(253,250,247,0.8)] border border-[rgba(45,36,32,0.06)] hover:bg-[rgba(193,123,92,0.06)] transition-all active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl transition-all active:scale-[0.97]"
+              style={{
+                background: "rgba(253,250,247,0.8)",
+                border: "1px solid rgba(45,36,32,0.05)",
+              }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
-              <span className="font-body text-[13px] text-[#5A4F49]">历史记录</span>
+              <span className="font-body text-[12px] text-[#5A4F49]">历史记录</span>
+            </button>
+            <button
+              onClick={() => setLocation("/chat")}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl transition-all active:scale-[0.97]"
+              style={{
+                background: "rgba(253,250,247,0.8)",
+                border: "1px solid rgba(45,36,32,0.05)",
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              <span className="font-body text-[12px] text-[#5A4F49]">AI 对话</span>
             </button>
           </div>
         </div>
@@ -419,7 +470,7 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* MobileTabBar - now shows on Home for mobile */}
+      {/* MobileTabBar */}
       <MobileTabBar />
     </div>
   );
