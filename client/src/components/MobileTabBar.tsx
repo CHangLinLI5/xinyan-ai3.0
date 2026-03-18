@@ -3,13 +3,23 @@
  * Design: Warm Ivory Minimalism
  * - 高度 56px + safe-area padding
  * - 毛玻璃背景 rgba(242,237,230,0.95) + blur(12px)
- * - 4 tabs: 检测 / 日历 / 记录 / 我的
+ * - 5 tabs: 首页 / 检测 / 日历 / 记录 / 我的
  * - 选中: #C17B5C, 未选中: #B5ADA7
- * - 仅 md 以下显示，不在 Home 页显示
+ * - 仅 md 以下显示
  */
 import { useLocation } from "wouter";
 
 const tabs = [
+  {
+    label: "首页",
+    path: "/",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    ),
+  },
   {
     label: "检测",
     path: "/chat",
@@ -57,6 +67,13 @@ const tabs = [
 export default function MobileTabBar() {
   const [location, setLocation] = useLocation();
 
+  // Determine active tab - handle /result as part of /chat
+  const getIsActive = (path: string) => {
+    if (path === "/") return location === "/";
+    if (path === "/chat") return location === "/chat" || location === "/result";
+    return location === path;
+  };
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
@@ -71,7 +88,7 @@ export default function MobileTabBar() {
     >
       <div className="flex items-center justify-around h-[56px]">
         {tabs.map((tab) => {
-          const isActive = location === tab.path;
+          const isActive = getIsActive(tab.path);
           return (
             <button
               key={tab.path}
@@ -84,7 +101,7 @@ export default function MobileTabBar() {
                 className="font-body"
                 style={{
                   fontSize: "9px",
-                  fontWeight: 500,
+                  fontWeight: isActive ? 600 : 500,
                   letterSpacing: "0.02em",
                 }}
               >

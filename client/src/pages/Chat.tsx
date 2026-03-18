@@ -1,13 +1,13 @@
 /*
  * Chat.tsx — 检测对话页
  * Design: Warm Ivory Minimalism
- * - 全视窗锁定，上 header + 中内容 + 下输入框
- * - 初始状态：欢迎屏幕 + 上传区域
- * - 对话状态：消息列表
- * - AI 分析流程：5 步进度动画
- * - 底部显示 MobileTabBar
+ * 
+ * 优化：
+ * - from=result 时展示上下文感知的欢迎消息 + 快捷追问按钮
+ * - 更流畅的页面过渡
+ * - 移动端底部输入框不被 TabBar 遮挡
  */
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import Logo from "@/components/Logo";
 import MobileTabBar from "@/components/MobileTabBar";
@@ -33,16 +33,26 @@ const quickQuestions = [
   "敏感肌日常护理建议",
 ];
 
+const resultFollowUps = [
+  "如何改善毛孔评分？",
+  "推荐适合我的精华液",
+  "日常护肤步骤建议",
+];
+
 export default function Chat() {
   const [, setLocation] = useLocation();
-  const fromResult = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("from") === "result";
+  const fromResult = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("from") === "result";
+  }, []);
+
   const [messages, setMessages] = useState<Message[]>(() => {
     if (fromResult) {
       return [
         {
           id: "welcome-from-result",
           role: "ai" as const,
-          content: "您好！我已经看过您的皮肤分析报告了。您可以针对报告中的任何问题向我提问，比如如何改善某个维度的评分、日常护肤步骤建议，或者产品选择方面的疑问。请随时告诉我您想了解什么！",
+          content: "您好！我已经看过您的皮肤分析报告了 📋\n\n您的综合评分为 82 分，整体状态良好。其中弹性紧致度表现优秀（91分），水分含量也很充足（88分）。毛孔细腻度（58分）和色素均匀度（65分）还有提升空间。\n\n您可以针对任何维度向我提问，我会给出个性化的建议。",
         },
       ];
     }
@@ -73,8 +83,6 @@ export default function Chat() {
   const runAnalysis = useCallback(() => {
     setIsAnalyzing(true);
     setAnalysisStep(0);
-
-    // Simulate 5 analysis steps
     let step = 0;
     const interval = setInterval(() => {
       step++;
@@ -100,8 +108,6 @@ export default function Chat() {
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
         addMessage("user", "请帮我分析一下皮肤状态", dataUrl);
-
-        // Try API first, fallback to mock
         setTimeout(() => {
           addMessage("ai", "收到您的照片，正在进行 AI 皮肤分析...");
           setTimeout(() => runAnalysis(), 600);
@@ -116,8 +122,6 @@ export default function Chat() {
     if (!inputText.trim()) return;
     addMessage("user", inputText.trim());
     setInputText("");
-
-    // Simulate AI response
     setTimeout(() => {
       addMessage(
         "ai",
@@ -130,16 +134,22 @@ export default function Chat() {
     (q: string) => {
       addMessage("user", q);
       setTimeout(() => {
-        addMessage(
-          "ai",
-          "这是一个很好的问题！为了给您更精准的建议，建议您先上传一张面部照片进行皮肤分析。分析完成后，我可以根据您的具体皮肤状况提供个性化的护理方案。"
-        );
+        if (fromResult) {
+          addMessage(
+            "ai",
+            "根据您的皮肤分析报告，我建议：\n\n1. 针对毛孔问题，每周使用 1-2 次含水杨酸的清洁面膜\n2. 日常使用含烟酰胺的精华液，帮助收缩毛孔并均匀肤色\n3. 保持现有的补水习惯，您的水分含量评分很好\n\n需要我推荐具体的产品吗？"
+          );
+        } else {
+          addMessage(
+            "ai",
+            "这是一个很好的问题！为了给您更精准的建议，建议您先上传一张面部照片进行皮肤分析。分析完成后，我可以根据您的具体皮肤状况提供个性化的护理方案。"
+          );
+        }
       }, 800);
     },
-    [addMessage]
+    [addMessage, fromResult]
   );
 
-  // Drag & drop handlers
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -155,7 +165,8 @@ export default function Chat() {
     [handleImageUpload]
   );
 
-  const isWelcome = messages.length === 0 && !isAnalyzing && !fromResult;
+  const isWelcome = messages.length === 0 && !isAnalyzing;
+  const showFollowUps = fromResult && messages.length === 1;
 
   return (
     <div
@@ -182,15 +193,15 @@ export default function Chat() {
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] bg-[rgba(242,237,230,0.8)] backdrop-blur-sm z-10">
+      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] bg-[rgba(242,237,230,0.8)] backdrop-blur-sm z-10 shrink-0">
         <button
-          onClick={() => setLocation("/")}
+          onClick={() => setLocation(fromResult ? "/result" : "/")}
           className="flex items-center gap-1 font-body text-sm text-[#7A6E68] hover:text-[#C17B5C] transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          返回
+          {fromResult ? "报告" : "返回"}
         </button>
         <Logo size="sm" />
         <button
@@ -202,10 +213,10 @@ export default function Chat() {
       </header>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
+      <div className="flex-1 overflow-y-auto pb-[130px] md:pb-[70px]">
         {isWelcome ? (
           /* Welcome Screen */
-          <div className="flex flex-col items-center justify-center h-full px-6 py-8">
+          <div className="flex flex-col items-center justify-center h-full px-5 py-8">
             <div className="w-16 h-16 rounded-full bg-[rgba(193,123,92,0.1)] flex items-center justify-center mb-5 anim-scale-in">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
@@ -216,12 +227,12 @@ export default function Chat() {
               皮肤智能分析
             </h2>
             <p className="font-body text-sm text-[#7A6E68] text-center max-w-sm mb-8 anim-fade-up d-200">
-              上传一张面部照片，AI 将为您进行专业的皮肤状态分析，提供个性化护肤建议
+              上传一张面部照片，AI 将为您进行专业的皮肤状态分析
             </p>
 
             {/* Upload area */}
             <div
-              className="w-full max-w-sm border-2 border-dashed border-[rgba(193,123,92,0.25)] rounded-xl p-8 text-center cursor-pointer hover:border-[rgba(193,123,92,0.5)] hover:bg-[rgba(193,123,92,0.03)] transition-all anim-fade-up d-300"
+              className="w-full max-w-sm border-2 border-dashed border-[rgba(193,123,92,0.25)] rounded-xl p-6 text-center cursor-pointer hover:border-[rgba(193,123,92,0.5)] hover:bg-[rgba(193,123,92,0.03)] transition-all active:scale-[0.98] anim-fade-up d-300"
               onClick={() => fileInputRef.current?.click()}
             >
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3 opacity-60">
@@ -254,8 +265,16 @@ export default function Chat() {
                 key={msg.id}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} anim-fade-up`}
               >
+                {msg.role === "ai" && (
+                  <div className="w-7 h-7 rounded-full bg-[rgba(193,123,92,0.12)] flex items-center justify-center shrink-0 mr-2 mt-1">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                    </svg>
+                  </div>
+                )}
                 <div
-                  className="max-w-[80%] md:max-w-[60%] px-4 py-3 relative"
+                  className="max-w-[75%] md:max-w-[60%] px-4 py-3 relative"
                   style={{
                     background: msg.role === "user" ? "#C17B5C" : "rgba(253, 250, 247, 0.95)",
                     color: msg.role === "user" ? "#FDFAF7" : "#2D2420",
@@ -270,24 +289,45 @@ export default function Chat() {
                       className="w-full max-w-[200px] rounded-lg mb-2"
                     />
                   )}
-                  <p className="font-body text-sm leading-relaxed" style={{ fontWeight: 300 }}>
+                  <p className="font-body text-[13px] leading-relaxed whitespace-pre-line" style={{ fontWeight: 300 }}>
                     {msg.content}
                   </p>
                 </div>
               </div>
             ))}
 
+            {/* Follow-up suggestions when coming from result */}
+            {showFollowUps && (
+              <div className="flex flex-wrap gap-2 pl-9 anim-fade-up d-200">
+                {resultFollowUps.map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => handleQuickQuestion(q)}
+                    className="px-3 py-2 rounded-xl text-[12px] font-body text-[#C17B5C] bg-[rgba(193,123,92,0.08)] border border-[rgba(193,123,92,0.15)] hover:bg-[rgba(193,123,92,0.15)] transition-all active:scale-[0.97]"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Analysis Steps */}
             {isAnalyzing && analysisStep >= 0 && analysisStep <= 5 && (
               <div className="flex justify-start anim-fade-up">
+                <div className="w-7 h-7 rounded-full bg-[rgba(193,123,92,0.12)] flex items-center justify-center shrink-0 mr-2 mt-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M12 1v2M12 21v2" />
+                  </svg>
+                </div>
                 <div
-                  className="max-w-[80%] md:max-w-[60%] px-5 py-4 rounded-[4px_14px_14px_14px]"
+                  className="max-w-[75%] md:max-w-[60%] px-5 py-4 rounded-[4px_14px_14px_14px]"
                   style={{
                     background: "rgba(253, 250, 247, 0.95)",
                     border: "1px solid rgba(45,36,32,0.08)",
                   }}
                 >
-                  <p className="font-body text-xs text-[#B5ADA7] mb-3 uppercase tracking-wider">
+                  <p className="font-body text-[10px] text-[#B5ADA7] mb-3 uppercase tracking-wider">
                     AI 分析进度
                   </p>
                   <div className="space-y-2.5">
@@ -297,7 +337,7 @@ export default function Chat() {
                       return (
                         <div key={i} className="flex items-center gap-2.5">
                           <span
-                            className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 transition-all duration-300"
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-body transition-all duration-300"
                             style={{
                               background: isDone
                                 ? "#C17B5C"
@@ -310,7 +350,7 @@ export default function Chat() {
                             {isDone ? "✓" : isCurrent ? "●" : "○"}
                           </span>
                           <span
-                            className="font-body text-sm transition-colors duration-300"
+                            className="font-body text-[13px] transition-colors duration-300"
                             style={{
                               color: isDone ? "#2D2420" : isCurrent ? "#C17B5C" : "#B5ADA7",
                               fontWeight: isCurrent ? 500 : 300,
@@ -336,8 +376,8 @@ export default function Chat() {
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-[rgba(45,36,32,0.06)] bg-[rgba(242,237,230,0.8)] backdrop-blur-sm px-4 py-3 pb-[calc(0.75rem+72px)] md:pb-3 z-10">
+      {/* Input Area - positioned above TabBar */}
+      <div className="fixed bottom-[56px] md:bottom-0 left-0 right-0 border-t border-[rgba(45,36,32,0.06)] bg-[rgba(242,237,230,0.95)] backdrop-blur-sm px-4 py-3 z-40 md:relative md:z-10">
         <div className="flex items-center gap-2 max-w-3xl mx-auto">
           <input
             type="file"
@@ -352,7 +392,7 @@ export default function Chat() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-[rgba(193,123,92,0.1)] hover:bg-[rgba(193,123,92,0.18)] transition-colors shrink-0"
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-[rgba(193,123,92,0.1)] hover:bg-[rgba(193,123,92,0.18)] transition-colors shrink-0 active:scale-95"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -365,13 +405,13 @@ export default function Chat() {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="上传照片或输入皮肤问题..."
-            className="flex-1 h-10 px-4 rounded-full font-body text-sm bg-[rgba(45,36,32,0.04)] border border-[rgba(45,36,32,0.08)] focus:border-[rgba(193,123,92,0.4)] focus:outline-none transition-colors placeholder:text-[#B5ADA7]"
+            placeholder={fromResult ? "针对报告提问..." : "上传照片或输入皮肤问题..."}
+            className="flex-1 h-10 px-4 rounded-full font-body text-[13px] bg-[rgba(45,36,32,0.04)] border border-[rgba(45,36,32,0.08)] focus:border-[rgba(193,123,92,0.4)] focus:outline-none transition-colors placeholder:text-[#B5ADA7]"
           />
           <button
             onClick={handleSend}
             disabled={!inputText.trim()}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-[#C17B5C] hover:bg-[#D4967A] transition-colors shrink-0 disabled:opacity-40"
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-[#C17B5C] hover:bg-[#D4967A] transition-colors shrink-0 disabled:opacity-40 active:scale-95"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FDFAF7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />
