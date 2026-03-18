@@ -1,6 +1,8 @@
-# 移动端留白修复 TODO
+# 浏览器适配修复 TODO
 
-- [ ] Home页面：移动端改为自然流式布局（min-h-screen），去掉page-locked和flex-1间隔
-- [ ] Home页面：内容自然排列，不锁定视口高度，消除中间大块空白
-- [ ] 检查其他页面是否有类似留白问题
-- [ ] 确保TabBar固定在底部不受影响
+- [ ] 添加 theme-color meta 标签让浏览器状态栏/地址栏颜色匹配页面
+- [ ] 添加 apple-mobile-web-app-capable 让页面更原生
+- [ ] 修复 html/body overflow:hidden 导致移动端页面被截断
+- [ ] Home 移动端不应该受 html overflow:hidden 限制
+- [ ] 确保 body 背景色延伸到浏览器安全区域
+- [ ] 添加 apple-mobile-web-app-status-bar-style

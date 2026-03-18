@@ -5,11 +5,36 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- Browser chrome color matching page background -->
+    <meta name="theme-color" content="#F2EDE6" />
+    <meta name="msapplication-navbutton-color" content="#F2EDE6" />
+    
+    <!-- iOS full-screen & status bar -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="芯颜 AI" />
+    
+    <!-- Android Chrome -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Prevent text size adjustment -->
+    <meta name="format-detection" content="telephone=no" />
+    
     <title>芯颜 AI - 皮肤智能分析平台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+    
+    <style>
+      /* Critical: ensure page fills entire browser viewport including safe areas */
+      html {
+        background-color: #F2EDE6;
+        /* Extend background behind notch/home indicator */
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+    </style>
   </head>
 
   <body>
