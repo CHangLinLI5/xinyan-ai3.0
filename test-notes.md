@@ -1,10 +1,11 @@
-# Desktop Home Audit
-- Nav hover underline: need to test hover
-- "咨询专家" reduced to text link with arrow → ✅ 
-- Stats now have dividers between them ✅
-- Floating cards have softer, more refined shadows ✅
-- Left gradient fade into image is wider/smoother ✅
-- Footer now has calendar/history links + refined dividers ✅
-- Overall cleaner, more balanced
+# Test Notes - Mobile Flow Fix
 
-# Mobile Home - need to check
+## Desktop Home - OK
+- Desktop layout uses page-locked, looks perfect
+- Hero image, floating cards, nav all working
+
+## Mobile Home - Fixed
+- Changed from page-locked to natural flow (min-h-[100dvh] flex-col)
+- Removed flex-1 spacer that caused huge white gap
+- Content flows naturally without viewport lock
+- Bottom padding accounts for TabBar + safe area

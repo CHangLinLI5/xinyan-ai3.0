@@ -2,8 +2,8 @@
  * Home.tsx — 首页
  * Design: Warm Ivory Minimalism
  * 
- * 移动端：精致上传卡片 + emoji 快捷提问 + 芯颜小贴士 + AI 聊天入口
- * 桌面端：左文右图不对称布局 + 浮动毛玻璃卡片 + 精致导航
+ * 移动端：自然流式布局，内容紧凑排列，无视口锁定
+ * 桌面端：左文右图不对称布局 + 浮动毛玻璃卡片 + 精致导航（page-locked）
  */
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
@@ -94,15 +94,10 @@ export default function Home() {
   ];
 
   return (
-    <div
-      className="page-locked flex flex-col"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Drag overlay */}
+    <>
+      {/* Drag overlay (global) */}
       {isDragging && (
-        <div className="fixed inset-0 z-50 bg-[rgba(242,237,230,0.95)] flex items-center justify-center anim-fade-in">
+        <div className="fixed inset-0 z-[100] bg-[rgba(242,237,230,0.95)] flex items-center justify-center anim-fade-in">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgba(193,123,92,0.1)] flex items-center justify-center">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -130,10 +125,15 @@ export default function Home() {
         }}
       />
 
-      {/* ===== MOBILE LAYOUT (md:hidden) ===== */}
-      <div className="md:hidden flex flex-col h-full overflow-y-auto" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
+      {/* ===== MOBILE LAYOUT — Natural flow, NOT page-locked ===== */}
+      <div
+        className="md:hidden min-h-[100dvh] flex flex-col bg-background"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {/* Mobile Header */}
-        <header className="flex items-center justify-between px-5 py-4 shrink-0">
+        <header className="flex items-center justify-between px-5 pt-[env(safe-area-inset-top,12px)] pb-2 shrink-0">
           <Logo />
           <button
             onClick={() => setLocation("/profile")}
@@ -147,17 +147,17 @@ export default function Home() {
         </header>
 
         {/* Greeting */}
-        <div className="px-5 pt-4 pb-2 anim-fade-up">
-          <h1 className="font-display text-[1.6rem] font-light text-[#2D2420] leading-tight">
+        <div className="px-5 pt-3 pb-1 anim-fade-up">
+          <h1 className="font-display text-[1.5rem] font-light text-[#2D2420] leading-tight">
             你好，我是<span className="text-clay-gradient">芯颜 AI</span>～
           </h1>
-          <p className="font-body text-[13px] text-[#9A8C82] mt-2 leading-relaxed" style={{ fontWeight: 300 }}>
+          <p className="font-body text-[13px] text-[#9A8C82] mt-1.5 leading-relaxed" style={{ fontWeight: 300 }}>
             你的专属皮肤智能分析助手
           </p>
         </div>
 
-        {/* Upload Card - Solid gradient, more premium feel */}
-        <div className="px-5 mt-5 mb-6 anim-fade-up d-100">
+        {/* Upload Card */}
+        <div className="px-5 mt-4 anim-fade-up d-100">
           <div
             className="relative rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
             onClick={() => fileInputRef.current?.click()}
@@ -166,7 +166,7 @@ export default function Home() {
               boxShadow: "0 2px 12px rgba(193,123,92,0.08), 0 0 0 1px rgba(193,123,92,0.06)",
             }}
           >
-            <div className="flex flex-col items-center py-8 px-6 relative">
+            <div className="flex flex-col items-center py-7 px-6 relative">
               {/* Decorative circles */}
               <div className="absolute top-3 right-4 w-20 h-20 rounded-full opacity-[0.04]" style={{ background: "#C17B5C" }} />
               <div className="absolute bottom-2 left-6 w-12 h-12 rounded-full opacity-[0.03]" style={{ background: "#C17B5C" }} />
@@ -186,8 +186,8 @@ export default function Home() {
               <p className="font-body text-[14px] font-medium text-[#2D2420]">上传面部照片</p>
               <p className="font-body text-[11px] text-[#9A8C82] mt-0.5">正面清晰照 · JPG / PNG</p>
               
-              {/* Stats row with dividers */}
-              <div className="flex items-center mt-4 gap-0">
+              {/* Stats row */}
+              <div className="flex items-center mt-3.5 gap-0">
                 {[
                   { num: "98%", label: "准确率" },
                   { num: "30s", label: "出结果" },
@@ -206,10 +206,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Questions with emoji and richer colors */}
-        <div className="px-5 mb-5 anim-fade-up d-200">
-          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-3 uppercase">或者直接问我</p>
-          <div className="flex flex-wrap gap-2.5">
+        {/* Quick Questions */}
+        <div className="px-5 mt-5 anim-fade-up d-200">
+          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">或者直接问我</p>
+          <div className="flex flex-wrap gap-2">
             {quickQuestions.map((q, i) => {
               const pillStyles = [
                 { bg: "linear-gradient(135deg, rgba(193,123,92,0.12) 0%, rgba(193,123,92,0.06) 100%)", border: "rgba(193,123,92,0.18)", text: "#8B5E3C" },
@@ -222,7 +222,7 @@ export default function Home() {
                 <button
                   key={q.text}
                   onClick={() => setLocation("/chat")}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
                   style={{
                     background: s.bg,
                     border: `1px solid ${s.border}`,
@@ -237,11 +237,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Spacer to push content down on tall screens */}
-        <div className="flex-1 min-h-4" />
-
         {/* Skin Tip Card */}
-        <div className="px-5 mb-5 anim-fade-up d-250">
+        <div className="px-5 mt-5 anim-fade-up d-250">
           <div
             className="rounded-xl px-4 py-3.5 flex items-start gap-3"
             style={{
@@ -259,11 +256,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* AI Chat Entry - bottom */}
-        <div className="px-5 mb-5 anim-fade-up d-300">
+        {/* AI Chat Entry */}
+        <div className="px-5 mt-5 anim-fade-up d-300" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 16px)' }}>
           <button
             onClick={() => setLocation("/chat")}
-            className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl transition-all active:scale-[0.98]"
+            className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
             style={{
               background: "linear-gradient(135deg, #C17B5C 0%, #D4956F 100%)",
               boxShadow: "0 4px 16px rgba(193,123,92,0.25)",
@@ -278,11 +275,19 @@ export default function Home() {
             </svg>
           </button>
         </div>
+
+        {/* MobileTabBar for mobile */}
+        <MobileTabBar />
       </div>
 
-      {/* ===== DESKTOP LAYOUT (hidden md:flex) ===== */}
-      <div className="hidden md:flex flex-col h-full">
-        {/* Desktop Top Nav — refined with hover underline */}
+      {/* ===== DESKTOP LAYOUT — page-locked ===== */}
+      <div
+        className="hidden md:flex page-locked flex-col"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {/* Desktop Top Nav */}
         <header className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-4">
           <Logo />
           <nav className="flex items-center gap-8">
@@ -296,7 +301,6 @@ export default function Home() {
                 style={{ fontWeight: 400 }}
               >
                 {link.label}
-                {/* Hover underline indicator */}
                 <span
                   className="absolute bottom-0 left-1/2 h-[1.5px] rounded-full transition-all duration-300"
                   style={{
@@ -452,7 +456,7 @@ export default function Home() {
           </div>
         </main>
 
-        {/* Desktop Footer — refined */}
+        {/* Desktop Footer */}
         <footer className="relative z-10 flex items-center justify-between px-8 lg:px-12 py-3" style={{ borderTop: "1px solid rgba(193,123,92,0.06)" }}>
           <p className="font-body text-[11px] text-[#B5ADA7]">© 2025 芯颜 AI · 专业皮肤智能分析</p>
           <div className="flex items-center gap-4">
@@ -483,9 +487,6 @@ export default function Home() {
           </div>
         </footer>
       </div>
-
-      {/* MobileTabBar */}
-      <MobileTabBar />
-    </div>
+    </>
   );
 }
