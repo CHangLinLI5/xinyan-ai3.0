@@ -70,7 +70,7 @@ export default function Profile() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
+      <div className="flex-1 overflow-y-auto md:pb-0" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
         <div className="max-w-md mx-auto px-5 py-8">
           {/* User Info */}
           <div className="flex flex-col items-center mb-8 anim-fade-up">

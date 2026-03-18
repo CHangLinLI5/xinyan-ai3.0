@@ -89,7 +89,7 @@ export default function Result() {
       </header>
 
       {/* ===== MOBILE LAYOUT ===== */}
-      <div className="md:hidden flex-1 flex flex-col overflow-hidden pb-[72px]">
+      <div className="md:hidden flex-1 flex flex-col overflow-hidden" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
         {/* Mobile Score Header - Compact */}
         <div className="px-5 pt-5 pb-4 anim-scale-in shrink-0">
           <div className="flex items-center gap-4">

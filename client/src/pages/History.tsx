@@ -108,7 +108,7 @@ export default function History() {
       </header>
 
       {/* Main */}
-      <div className="flex-1 flex overflow-hidden pb-[72px] md:pb-0">
+      <div className="flex-1 flex overflow-hidden md:pb-0" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
         {/* Left: Filter Panel (desktop) */}
         <div className="hidden md:flex flex-col w-[220px] border-r border-[rgba(45,36,32,0.06)] overflow-y-auto px-4 py-4">
           <button

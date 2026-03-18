@@ -213,7 +213,7 @@ export default function Chat() {
       </header>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto pb-[130px] md:pb-[70px]">
+      <div className="flex-1 overflow-y-auto md:pb-[70px]" style={{ paddingBottom: 'calc(120px + env(safe-area-inset-bottom, 0px))' }}>
         {isWelcome ? (
           /* Welcome Screen */
           <div className="flex flex-col items-center justify-center h-full px-5 py-8">

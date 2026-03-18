@@ -131,13 +131,13 @@ export default function Home() {
       />
 
       {/* ===== MOBILE LAYOUT (md:hidden) ===== */}
-      <div className="md:hidden flex flex-col h-full overflow-y-auto pb-[72px]">
+      <div className="md:hidden flex flex-col h-full overflow-y-auto" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
         {/* Mobile Header */}
-        <header className="flex items-center justify-between px-5 py-3 shrink-0">
+        <header className="flex items-center justify-between px-5 py-4 shrink-0">
           <Logo />
           <button
             onClick={() => setLocation("/profile")}
-            className="w-8 h-8 rounded-full bg-[rgba(193,123,92,0.08)] flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-[rgba(193,123,92,0.08)] flex items-center justify-center"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -147,17 +147,17 @@ export default function Home() {
         </header>
 
         {/* Greeting */}
-        <div className="px-5 pt-3 pb-1 anim-fade-up">
-          <h1 className="font-display text-[1.5rem] font-light text-[#2D2420] leading-tight">
+        <div className="px-5 pt-4 pb-2 anim-fade-up">
+          <h1 className="font-display text-[1.6rem] font-light text-[#2D2420] leading-tight">
             你好，我是<span className="text-clay-gradient">芯颜 AI</span>～
           </h1>
-          <p className="font-body text-[13px] text-[#9A8C82] mt-1.5 leading-relaxed" style={{ fontWeight: 300 }}>
+          <p className="font-body text-[13px] text-[#9A8C82] mt-2 leading-relaxed" style={{ fontWeight: 300 }}>
             你的专属皮肤智能分析助手
           </p>
         </div>
 
         {/* Upload Card - Solid gradient, more premium feel */}
-        <div className="px-5 mt-4 mb-5 anim-fade-up d-100">
+        <div className="px-5 mt-5 mb-6 anim-fade-up d-100">
           <div
             className="relative rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
             onClick={() => fileInputRef.current?.click()}
@@ -166,7 +166,7 @@ export default function Home() {
               boxShadow: "0 2px 12px rgba(193,123,92,0.08), 0 0 0 1px rgba(193,123,92,0.06)",
             }}
           >
-            <div className="flex flex-col items-center py-7 px-6 relative">
+            <div className="flex flex-col items-center py-8 px-6 relative">
               {/* Decorative circles */}
               <div className="absolute top-3 right-4 w-20 h-20 rounded-full opacity-[0.04]" style={{ background: "#C17B5C" }} />
               <div className="absolute bottom-2 left-6 w-12 h-12 rounded-full opacity-[0.03]" style={{ background: "#C17B5C" }} />
@@ -207,9 +207,9 @@ export default function Home() {
         </div>
 
         {/* Quick Questions with emoji and richer colors */}
-        <div className="px-5 mb-4 anim-fade-up d-200">
-          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">或者直接问我</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="px-5 mb-5 anim-fade-up d-200">
+          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-3 uppercase">或者直接问我</p>
+          <div className="flex flex-wrap gap-2.5">
             {quickQuestions.map((q, i) => {
               const pillStyles = [
                 { bg: "linear-gradient(135deg, rgba(193,123,92,0.12) 0%, rgba(193,123,92,0.06) 100%)", border: "rgba(193,123,92,0.18)", text: "#8B5E3C" },
@@ -222,7 +222,7 @@ export default function Home() {
                 <button
                   key={q.text}
                   onClick={() => setLocation("/chat")}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
                   style={{
                     background: s.bg,
                     border: `1px solid ${s.border}`,
@@ -237,8 +237,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Skin Tip Card - fills the gap */}
-        <div className="px-5 mb-4 anim-fade-up d-250">
+        {/* Spacer to push content down on tall screens */}
+        <div className="flex-1 min-h-4" />
+
+        {/* Skin Tip Card */}
+        <div className="px-5 mb-5 anim-fade-up d-250">
           <div
             className="rounded-xl px-4 py-3.5 flex items-start gap-3"
             style={{
@@ -257,10 +260,10 @@ export default function Home() {
         </div>
 
         {/* AI Chat Entry - bottom */}
-        <div className="px-5 mt-auto mb-4 anim-fade-up d-300">
+        <div className="px-5 mb-5 anim-fade-up d-300">
           <button
             onClick={() => setLocation("/chat")}
-            className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
+            className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl transition-all active:scale-[0.98]"
             style={{
               background: "linear-gradient(135deg, #C17B5C 0%, #D4956F 100%)",
               boxShadow: "0 4px 16px rgba(193,123,92,0.25)",
