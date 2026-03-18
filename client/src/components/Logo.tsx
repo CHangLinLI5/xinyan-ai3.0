@@ -1,22 +1,27 @@
 /*
  * Logo — 芯颜 AI
- * SVG: 三层同心圆 + 文字
+ * 使用品牌 favicon 图片替代 SVG 同心圆
  */
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   showText?: boolean;
 }
 
+const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663449767573/9NFV4vPhGYnrkNfpEcCSrd/favicon-192_9ec4093e.png";
+
 export default function Logo({ size = "md", showText = true }: LogoProps) {
-  const iconSize = size === "sm" ? 24 : size === "md" ? 28 : 34;
+  const iconSize = size === "sm" ? 24 : size === "md" ? 30 : 36;
 
   return (
     <div className="flex items-center gap-2">
-      <svg width={iconSize} height={iconSize} viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="18" stroke="#C17B5C" strokeWidth="1.5" fill="none" />
-        <circle cx="20" cy="20" r="12" fill="rgba(193,123,92,0.15)" />
-        <circle cx="20" cy="20" r="6" fill="#C17B5C" />
-      </svg>
+      <img
+        src={LOGO_URL}
+        alt="芯颜 AI"
+        width={iconSize}
+        height={iconSize}
+        className="rounded-full object-cover"
+        style={{ width: iconSize, height: iconSize }}
+      />
       {showText && (
         <span className="font-display font-normal tracking-tight" style={{ fontSize: size === "sm" ? 16 : size === "md" ? 18 : 22 }}>
           <span className="text-[#2D2420]">芯颜</span>
