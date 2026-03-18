@@ -27,6 +27,8 @@ const quickQuestions = [
   { text: "改善毛孔粗大", emoji: "🔍" },
   { text: "敏感肌护理", emoji: "🌸" },
   { text: "美白淡斑方法", emoji: "✨" },
+  { text: "祛痘方法", emoji: "🌿" },
+  { text: "抗衰老建议", emoji: "💎" },
 ];
 
 const skinTips = [
@@ -184,8 +186,14 @@ export default function Home() {
                 </svg>
               </div>
               <p className="font-body text-[14px] font-medium text-[#2D2420]">上传面部照片</p>
-              <p className="font-body text-[11px] text-[#9A8C82] mt-0.5">正面清晰照 · JPG / PNG</p>
+              <p className="font-body text-[12px] text-[#9A8C82] mt-0.5">正面清晰照 · JPG / PNG</p>
               
+              {/* CTA Button */}
+              <div className="mt-3 px-5 py-2 rounded-full"
+                style={{ background: "rgba(193,123,92,0.12)", border: "1px solid rgba(193,123,92,0.18)" }}>
+                <span className="font-body text-[13px] text-[#C17B5C] font-medium">点击选择照片</span>
+              </div>
+
               {/* Stats row */}
               <div className="flex items-center mt-3.5 gap-0">
                 {[
@@ -196,8 +204,8 @@ export default function Home() {
                   <div key={s.label} className="flex items-center">
                     {i > 0 && <div className="w-px h-3 bg-[rgba(193,123,92,0.15)] mx-3" />}
                     <div className="flex items-center gap-1">
-                      <span className="font-body text-[11px] text-[#C17B5C] font-semibold">{s.num}</span>
-                      <span className="font-body text-[10px] text-[#B5ADA7]">{s.label}</span>
+                      <span className="font-body text-[12px] text-[#C17B5C] font-semibold">{s.num}</span>
+                      <span className="font-body text-[12px] text-[#B5ADA7]">{s.label}</span>
                     </div>
                   </div>
                 ))}
@@ -208,14 +216,16 @@ export default function Home() {
 
         {/* Quick Questions */}
         <div className="px-5 mt-5 anim-fade-up d-200">
-          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">或者直接问我</p>
+          <p className="font-body text-[12px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">或者直接问我</p>
           <div className="flex flex-wrap gap-2">
             {quickQuestions.map((q, i) => {
               const pillStyles = [
                 { bg: "linear-gradient(135deg, rgba(193,123,92,0.12) 0%, rgba(193,123,92,0.06) 100%)", border: "rgba(193,123,92,0.18)", text: "#8B5E3C" },
                 { bg: "linear-gradient(135deg, rgba(168,130,100,0.14) 0%, rgba(168,130,100,0.06) 100%)", border: "rgba(168,130,100,0.20)", text: "#6B5030" },
-                { bg: "linear-gradient(135deg, rgba(180,155,130,0.13) 0%, rgba(180,155,130,0.05) 100%)", border: "rgba(180,155,130,0.18)", text: "#6B5540" },
+                { bg: "linear-gradient(135deg, rgba(139,162,130,0.14) 0%, rgba(139,162,130,0.06) 100%)", border: "rgba(139,162,130,0.20)", text: "#4A6B40" },
                 { bg: "linear-gradient(135deg, rgba(200,150,110,0.14) 0%, rgba(200,150,110,0.06) 100%)", border: "rgba(200,150,110,0.20)", text: "#7A5530" },
+                { bg: "linear-gradient(135deg, rgba(130,155,140,0.13) 0%, rgba(130,155,140,0.05) 100%)", border: "rgba(130,155,140,0.18)", text: "#3D6B50" },
+                { bg: "linear-gradient(135deg, rgba(155,130,165,0.13) 0%, rgba(155,130,165,0.05) 100%)", border: "rgba(155,130,165,0.18)", text: "#5A4070" },
               ];
               const s = pillStyles[i % pillStyles.length];
               return (
@@ -250,14 +260,36 @@ export default function Home() {
               <span className="text-[14px]">💡</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-body text-[10px] text-[#C17B5C] font-medium tracking-wider mb-1">芯颜小贴士</p>
+              <p className="font-body text-[12px] text-[#C17B5C] font-medium tracking-wider mb-1">芯颜小贴士</p>
               <p className="font-body text-[12px] text-[#5A4F49] leading-relaxed">{skinTips[tipIndex]}</p>
             </div>
           </div>
         </div>
 
+        {/* Recent Detection Card (if exists) */}
+        <div className="px-5 mt-5 anim-fade-up d-280">
+          <div className="rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
+            onClick={() => setLocation("/result")}
+            style={{
+              background: "rgba(237,232,224,0.6)",
+              border: "1px solid rgba(45,36,32,0.05)",
+            }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, rgba(193,123,92,0.15), rgba(193,123,92,0.05))" }}>
+              <span className="font-display text-[16px] font-light text-[#C17B5C]">82</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-body text-[13px] text-[#2D2420] font-medium">最近检测</p>
+              <p className="font-body text-[12px] text-[#9A8C82]">3月25日 · 综合评分良好</p>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </div>
+        </div>
+
         {/* AI Chat Entry */}
-        <div className="px-5 mt-5 anim-fade-up d-300" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 16px)' }}>
+        <div className="px-5 mt-4 anim-fade-up d-300" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 16px)' }}>
           <button
             onClick={() => setLocation("/chat")}
             className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
@@ -356,7 +388,7 @@ export default function Home() {
                 开始检测
               </button>
               <button
-                className="font-body text-[13px] text-[#9A8C82] hover:text-[#C17B5C] transition-colors px-4 py-2"
+                className="font-body text-[12px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors px-4 py-2"
                 onClick={() => toast("专家咨询功能即将推出")}
               >
                 咨询专家 →
@@ -406,7 +438,7 @@ export default function Home() {
                 WebkitBackdropFilter: "blur(20px) saturate(1.4)",
                 borderRadius: "16px",
                 border: "1px solid rgba(255,255,255,0.5)",
-                boxShadow: "0 8px 32px rgba(45,36,32,0.08), 0 2px 8px rgba(45,36,32,0.04)",
+                boxShadow: "0 12px 40px rgba(45,36,32,0.06), 0 4px 12px rgba(45,36,32,0.03)",
               }}
             >
               <p className="label-sm mb-2">综合评分</p>
@@ -441,7 +473,7 @@ export default function Home() {
                 WebkitBackdropFilter: "blur(20px) saturate(1.4)",
                 borderRadius: "14px",
                 border: "1px solid rgba(255,255,255,0.45)",
-                boxShadow: "0 8px 32px rgba(45,36,32,0.08), 0 2px 8px rgba(45,36,32,0.04)",
+                boxShadow: "0 12px 40px rgba(45,36,32,0.06), 0 4px 12px rgba(45,36,32,0.03)",
               }}
             >
               <p className="label-sm mb-3">维度分析</p>
@@ -449,8 +481,8 @@ export default function Home() {
                 {metrics.map((m) => (
                   <div key={m.label}>
                     <div className="flex justify-between mb-1">
-                      <span className="font-body text-[11px] text-[#7A6E68]">{m.label}</span>
-                      <span className="font-body text-[11px] text-[#C17B5C] font-medium">{m.value}</span>
+                      <span className="font-body text-[12px] text-[#7A6E68]">{m.label}</span>
+                      <span className="font-body text-[12px] text-[#C17B5C] font-medium">{m.value}</span>
                     </div>
                     <div className="w-full h-1 bg-[rgba(45,36,32,0.06)] rounded-full overflow-hidden">
                       <div
@@ -470,31 +502,31 @@ export default function Home() {
 
         {/* Desktop Footer */}
         <footer className="relative z-10 flex items-center justify-between px-8 lg:px-12 py-3" style={{ borderTop: "1px solid rgba(193,123,92,0.06)" }}>
-          <p className="font-body text-[11px] text-[#B5ADA7]">© 2025 芯颜 AI · 专业皮肤智能分析</p>
+          <p className="font-body text-[12px] text-[#B5ADA7]">© 2025 芯颜 AI · 专业皮肤智能分析</p>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setLocation("/calendar")}
-              className="font-body text-[11px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
+              className="font-body text-[12px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
             >
               护肤日历
             </button>
             <span className="text-[#E0D8D0]">·</span>
             <button
               onClick={() => setLocation("/history")}
-              className="font-body text-[11px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
+              className="font-body text-[12px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
             >
               历史记录
             </button>
             <span className="text-[#E0D8D0]">·</span>
             <div className="flex items-center gap-1.5">
               <span
-                className="w-1.5 h-1.5 rounded-full"
+                className="w-[5px] h-[5px] rounded-full"
                 style={{
                   background: "linear-gradient(135deg, #C17B5C, #D4956F)",
                   animation: "pulse-dot 2s ease-in-out infinite",
                 }}
               />
-              <span className="font-body text-[11px] text-[#B5ADA7]">服务运行中</span>
+              <span className="font-body text-[12px] text-[#B5ADA7]">服务运行中</span>
             </div>
           </div>
         </footer>

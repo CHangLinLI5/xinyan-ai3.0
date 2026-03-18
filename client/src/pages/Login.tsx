@@ -105,7 +105,7 @@ export default function Login() {
             {/* Nickname (register only) */}
             {!isLogin && (
               <div className="anim-fade-up">
-                <label className="font-body text-[11px] text-[#9A8C82] tracking-wider uppercase block mb-1.5 ml-1">
+                <label className="font-body text-[12px] text-[#9A8C82] tracking-wider uppercase block mb-1.5 ml-1">
                   昵称
                 </label>
                 <input
@@ -120,7 +120,7 @@ export default function Login() {
 
             {/* Phone */}
             <div>
-              <label className="font-body text-[11px] text-[#9A8C82] tracking-wider uppercase block mb-1.5 ml-1">
+              <label className="font-body text-[12px] text-[#9A8C82] tracking-wider uppercase block mb-1.5 ml-1">
                 手机号
               </label>
               <input
@@ -134,7 +134,7 @@ export default function Login() {
 
             {/* Verification Code */}
             <div>
-              <label className="font-body text-[11px] text-[#9A8C82] tracking-wider uppercase block mb-1.5 ml-1">
+              <label className="font-body text-[12px] text-[#9A8C82] tracking-wider uppercase block mb-1.5 ml-1">
                 验证码
               </label>
               <div className="flex gap-3">
@@ -199,7 +199,7 @@ export default function Login() {
           {/* Divider */}
           <div className="flex items-center gap-3 my-6 anim-fade-up d-300">
             <div className="flex-1 h-px bg-[rgba(45,36,32,0.06)]" />
-            <span className="font-body text-[11px] text-[#C5BBB3]">其他方式</span>
+            <span className="font-body text-[12px] text-[#C5BBB3]">其他方式</span>
             <div className="flex-1 h-px bg-[rgba(45,36,32,0.06)]" />
           </div>
 
@@ -224,7 +224,7 @@ export default function Login() {
           </div>
 
           {/* Terms */}
-          <p className="text-center font-body text-[11px] text-[#C5BBB3] mt-6 leading-relaxed anim-fade-up d-500" style={{ fontWeight: 300 }}>
+          <p className="text-center font-body text-[12px] text-[#C5BBB3] mt-6 leading-relaxed anim-fade-up d-500" style={{ fontWeight: 300 }}>
             登录即表示同意芯颜 AI 的
             <button className="text-[#9A8C82] underline" onClick={() => toast("用户协议页面即将推出")}>用户协议</button>
             {" "}和{" "}

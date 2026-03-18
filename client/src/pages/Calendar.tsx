@@ -106,7 +106,7 @@ export default function Calendar() {
                 {currentYear} 年 {currentMonth} 月
               </h2>
               {monthRecords.length > 0 && (
-                <span className="pill-clay text-[10px] mt-1">月均 {avgScore} 分</span>
+                <span className="pill-clay text-[12px] mt-1">月均 {avgScore} 分</span>
               )}
             </div>
             <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[rgba(45,36,32,0.06)] transition-colors">
@@ -130,7 +130,7 @@ export default function Calendar() {
               <div key={`empty-${i}`} className="aspect-square" />
             ))}
 
-            {/* Day cells */}
+            {/* Day cells - Ch5.1: min-h-[44px], remove score text, keep dot only */}
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
               const dateKey = getDateKey(day);
@@ -140,8 +140,8 @@ export default function Calendar() {
               return (
                 <div
                   key={day}
-                  className={`aspect-square rounded-lg flex flex-col items-center justify-center relative transition-all ${
-                    record ? "cursor-pointer hover:bg-[rgba(193,123,92,0.08)]" : ""
+                  className={`min-h-[44px] rounded-lg flex flex-col items-center justify-center relative transition-all ${
+                    record ? "cursor-pointer hover:bg-[rgba(193,123,92,0.08)] active:scale-95" : ""
                   } ${todayMark ? "ring-1 ring-[#C17B5C]" : ""}`}
                   onClick={() => record && setSelectedRecord(record)}
                 >
@@ -152,38 +152,64 @@ export default function Calendar() {
                     {day}
                   </span>
                   {record && (
-                    <>
-                      <div
-                        className="w-1.5 h-1.5 rounded-full mt-0.5"
-                        style={{ background: scoreColor(record.score) }}
-                      />
-                      <span
-                        className="font-body text-[9px] font-medium mt-0.5"
-                        style={{ color: scoreColor(record.score) }}
-                      >
-                        {record.score}
-                      </span>
-                    </>
+                    <div
+                      className="w-2 h-2 rounded-full mt-1"
+                      style={{ background: scoreColor(record.score) }}
+                    />
                   )}
                 </div>
               );
             })}
           </div>
 
-          {/* Legend */}
-          <div className="flex items-center gap-4 mt-5 anim-fade-up d-300">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: "rgba(193,123,92,0.9)" }} />
-              <span className="font-body text-[10px] text-[#B5ADA7]">≥85 优秀</span>
+          {/* Ch5.1: Summary bar */}
+          <div className="flex items-center justify-between mt-4 px-1 anim-fade-up d-300">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full" style={{ background: "rgba(193,123,92,0.9)" }} />
+                <span className="font-body text-[12px] text-[#B5ADA7]">优秀</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full" style={{ background: "rgba(193,123,92,0.6)" }} />
+                <span className="font-body text-[12px] text-[#B5ADA7]">良好</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full" style={{ background: "rgba(193,123,92,0.35)" }} />
+                <span className="font-body text-[12px] text-[#B5ADA7]">关注</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: "rgba(193,123,92,0.6)" }} />
-              <span className="font-body text-[10px] text-[#B5ADA7]">70-84 良好</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: "rgba(193,123,92,0.35)" }} />
-              <span className="font-body text-[10px] text-[#B5ADA7]">&lt;70 需关注</span>
-            </div>
+            <span className="font-body text-[12px] text-[#B5ADA7]">{monthRecords.length} 次检测</span>
+          </div>
+
+          {/* Ch5.2: Mobile month records list */}
+          <div className="md:hidden mt-5 space-y-2.5 anim-fade-up d-400">
+            <p className="label-sm mb-2">本月记录</p>
+            {monthRecords.length > 0 ? monthRecords.map((r) => (
+              <div
+                key={r.id}
+                className="card-warm p-3.5 flex items-center gap-3 active:scale-[0.98] transition-transform"
+                onClick={() => setSelectedRecord(r)}
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: `${scoreColor(r.score)}15` }}
+                >
+                  <span className="font-display text-base font-light" style={{ color: scoreColor(r.score) }}>{r.score}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-[13px] font-medium text-[#2D2420]">{r.date.split("-").slice(1).join("/")}</span>
+                    <span className={`text-[12px] px-1.5 py-0.5 rounded-full font-body ${tagStyle(r.tag)}`}>{r.tag}</span>
+                  </div>
+                  <p className="font-body text-[12px] text-[#9A8C82] mt-0.5 truncate">{r.summary}</p>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </div>
+            )) : (
+              <p className="font-body text-sm text-[#B5ADA7] text-center py-6">本月暂无记录</p>
+            )}
           </div>
         </div>
 
@@ -203,7 +229,7 @@ export default function Calendar() {
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="font-body text-xs text-[#7A6E68]">{r.date.split("-").slice(1).join("/")}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-body font-medium ${tagStyle(r.tag)}`}>
+                  <span className={`text-[12px] px-1.5 py-0.5 rounded-full font-body font-medium ${tagStyle(r.tag)}`}>
                     {r.tag}
                   </span>
                 </div>
@@ -225,7 +251,7 @@ export default function Calendar() {
                     ))}
                   </div>
                 </div>
-                <p className="font-body text-[11px] text-[#9A8C82] mt-1 line-clamp-1">{r.summary}</p>
+                <p className="font-body text-[12px] text-[#9A8C82] mt-1 line-clamp-1">{r.summary}</p>
               </div>
             ))}
 

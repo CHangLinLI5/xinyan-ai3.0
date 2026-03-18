@@ -113,60 +113,32 @@
   --sidebar-ring: rgba(193, 123, 92, 0.4);
 }
 
-/* ===== Global Reset ===== */
+/* ===== Global Reset (Chapter 0 fixes) ===== */
 html, body, #root {
   min-height: 100%;
   min-height: 100dvh;
   font-family: 'DM Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   color: var(--ink);
-  background: #F2EDE6;
-  background: linear-gradient(135deg, #F5F0E8 0%, #EDE8DF 100%);
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* On mobile, allow natural scrolling for flow pages */
-@media (max-width: 767px) {
-  html, body {
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: auto;
-  }
-  #root {
-    height: auto;
-    min-height: 100dvh;
-  }
+html {
+  background-color: #F2EDE6;
 }
 
-/* On desktop, lock viewport */
-@media (min-width: 768px) {
-  html, body, #root {
-    height: 100dvh;
-    overflow: hidden;
-  }
-}
-
-/* Subtle radial gradient overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse at 70% 20%, rgba(193, 123, 92, 0.04) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Ensure safe area insets are respected */
+/* 0.3: Body background with merged gradient (no ::before pseudo-element) */
 body {
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  margin: 0;
+  background-color: #F2EDE6;
+  background-image:
+    radial-gradient(ellipse at 70% 20%, rgba(193, 123, 92, 0.04) 0%, transparent 60%),
+    linear-gradient(135deg, #F5F0E8 0%, #EDE8DF 100%);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-#root {
-  position: relative;
-  z-index: 1;
-}
-
+/* 0.5: page-locked — mobile: natural flow; desktop: fixed viewport */
 /* ===== Custom Scrollbar ===== */
 ::-webkit-scrollbar {
   width: 3px;
@@ -227,7 +199,7 @@ body {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -270,14 +242,29 @@ body {
     min-width: 0;
   }
 
-  /* Page locked layout — uses dvh for proper mobile viewport */
+  /* 0.5: Page locked — mobile: natural flow (scrollable); desktop: fixed viewport */
   .page-locked {
     width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-    position: fixed;
-    inset: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .page-locked {
+      height: 100dvh;
+      min-height: auto;
+      overflow: hidden;
+      position: fixed;
+      inset: 0;
+    }
+  }
+
+  /* 1.4: Bottom safe area utility classes */
+  .pb-tabbar {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 12px);
+  }
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
   }
 
   /* ===== Buttons ===== */
@@ -353,7 +340,7 @@ body {
     border-radius: 100px;
     padding: 0.2rem 0.65rem;
     font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.02em;
   }
@@ -410,10 +397,11 @@ body {
     font-family: 'DM Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   }
 
+  /* 1.1: label-sm font size 10px → 12px */
   .label-sm {
     font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    letter-spacing: 1.5px;
+    font-size: 12px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     font-weight: 500;
     color: #B5ADA7;

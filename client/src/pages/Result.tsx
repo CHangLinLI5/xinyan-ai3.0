@@ -5,7 +5,7 @@
  * 移动端：紧凑评分头部 + 横向维度滚动 + 全宽 Tab + 醒目聊天按钮
  * 桌面端：左侧评分面板 + 右侧 Tab 详情
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import Logo from "@/components/Logo";
@@ -63,8 +63,23 @@ export default function Result() {
   const [activeTab, setActiveTab] = useState(0);
   const record = DEFAULT_RESULT;
   const score = useCountUp(record.score);
-
   const tabs = ["问题分析", "护肤建议", "产品推荐"];
+
+  // Ch4.3: Swipe gesture for tabs
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && activeTab < 2) setActiveTab((p) => p + 1);
+      if (dx > 0 && activeTab > 0) setActiveTab((p) => p - 1);
+    }
+  }, [activeTab]);
 
   return (
     <div className="page-locked flex flex-col">
@@ -93,49 +108,51 @@ export default function Result() {
         {/* Mobile Score Header - Compact */}
         <div className="px-5 pt-5 pb-4 anim-scale-in shrink-0">
           <div className="flex items-center gap-4">
-            {/* Score Circle */}
-            <div className="relative w-20 h-20 shrink-0">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(45,36,32,0.06)" strokeWidth="5" />
+            {/* Score Circle - Ch4.2: enlarged to 88px */}
+            <div className="relative w-[88px] h-[88px] shrink-0">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 88 88">
+                <circle cx="44" cy="44" r="38" fill="none" stroke="rgba(45,36,32,0.06)" strokeWidth="5" />
                 <circle
-                  cx="40" cy="40" r="34" fill="none"
+                  cx="44" cy="44" r="38" fill="none"
                   stroke="#C17B5C"
                   strokeWidth="5"
                   strokeLinecap="round"
-                  strokeDasharray={`${(record.score / 100) * 213.6} 213.6`}
+                  strokeDasharray={`${(record.score / 100) * 238.8} 238.8`}
                   style={{ transition: "stroke-dasharray 1.2s cubic-bezier(0.22, 1, 0.36, 1)" }}
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-display text-[1.5rem] font-light leading-none text-clay-gradient">{score}</span>
-                <span className="font-body text-[9px] text-[#B5ADA7] mt-0.5">/ 100</span>
+                <span className="font-display text-[1.75rem] font-light leading-none text-clay-gradient">{score}</span>
+                <span className="font-body text-[12px] text-[#B5ADA7] mt-0.5">/ 100</span>
               </div>
             </div>
 
             {/* Score Info */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="pill-clay text-[11px] py-0.5 px-2.5">
+                <span className="pill-clay text-[12px] py-0.5 px-2.5">
                   {record.tag === "良好" ? "皮肤状态良好" : record.tag}
                 </span>
               </div>
               <p className="font-body text-[12px] text-[#7A6E68] leading-relaxed" style={{ fontWeight: 300 }}>
                 {record.summary}
               </p>
-              <p className="font-body text-[10px] text-[#B5ADA7] mt-1">{record.date} · 6 维度分析</p>
+              <p className="font-body text-[12px] text-[#B5ADA7] mt-1">{record.date} · 6 维度分析</p>
             </div>
           </div>
         </div>
 
-        {/* Mobile Horizontal Metrics Scroll */}
-        <div className="px-5 pb-4 shrink-0 anim-fade-up d-100">
+        {/* Mobile Horizontal Metrics Scroll - Ch4.1: gradient mask */}
+        <div className="px-5 pb-4 shrink-0 anim-fade-up d-100 relative">
+          {/* Right gradient fade hint */}
+          <div className="absolute top-0 right-5 bottom-1 w-8 z-10 pointer-events-none" style={{ background: "linear-gradient(to left, rgba(242,237,230,1) 0%, rgba(242,237,230,0) 100%)" }} />
           <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: "none" }}>
             {record.metrics.map((m, i) => (
               <div
                 key={i}
                 className="shrink-0 w-[100px] rounded-xl p-3 border border-[rgba(45,36,32,0.06)] bg-[rgba(253,250,247,0.8)]"
               >
-                <p className="font-body text-[10px] text-[#9A8C82] mb-1 truncate">{m.label}</p>
+                <p className="font-body text-[12px] text-[#9A8C82] mb-1 truncate">{m.label}</p>
                 <div className="flex items-baseline gap-1">
                   <span className="font-display text-lg font-light" style={{ color: scoreColor(m.score) }}>
                     {m.score}
@@ -152,7 +169,7 @@ export default function Result() {
                     }}
                   />
                 </div>
-                <span className={`inline-block mt-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-body ${statusStyle(m.status)}`}>
+                <span className={`inline-block mt-1.5 text-[12px] px-1.5 py-0.5 rounded-full font-body ${statusStyle(m.status)}`}>
                   {m.status}
                 </span>
               </div>
@@ -160,11 +177,11 @@ export default function Result() {
           </div>
         </div>
 
-        {/* Mobile Chat CTA - Prominent */}
+        {/* Mobile Chat CTA - Ch4.4: rounded-2xl */}
         <div className="px-5 pb-3 shrink-0 anim-fade-up d-200">
           <button
             onClick={() => setLocation("/chat?from=result")}
-            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-body text-sm font-medium transition-all duration-200 active:scale-[0.97]"
+            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-body text-sm font-medium transition-all duration-200 active:scale-[0.97]"
             style={{
               background: "linear-gradient(135deg, #C17B5C 0%, #D4967A 100%)",
               color: "#FDFAF7",
@@ -198,8 +215,8 @@ export default function Result() {
           ))}
         </div>
 
-        {/* Mobile Tab Content */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        {/* Mobile Tab Content - Ch4.3: swipe gesture */}
+        <div className="flex-1 overflow-y-auto px-4 py-4" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           {activeTab === 0 && (
             <div className="space-y-3">
               {record.metrics.map((m, i) => (
@@ -210,7 +227,7 @@ export default function Result() {
                       <span className="font-display text-lg font-light" style={{ color: scoreColor(m.score) }}>
                         {m.score}
                       </span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-body font-medium ${statusStyle(m.status)}`}>
+                      <span className={`text-[12px] px-2 py-0.5 rounded-full font-body font-medium ${statusStyle(m.status)}`}>
                         {m.status}
                       </span>
                     </div>
@@ -250,7 +267,7 @@ export default function Result() {
                 />
                 <div className="absolute bottom-3 left-4">
                   <p className="font-display text-base text-white font-normal">精选护肤推荐</p>
-                  <p className="font-body text-[11px] text-white/70 mt-0.5">根据您的皮肤分析结果定制</p>
+                  <p className="font-body text-[12px] text-white/70 mt-0.5">根据您的皮肤分析结果定制</p>
                 </div>
               </div>
 
@@ -264,11 +281,11 @@ export default function Result() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <h4 className="font-body text-[13px] font-medium text-[#2D2420]">{p.name}</h4>
-                          <p className="font-body text-[11px] text-[#B5ADA7]">{p.brand} · {p.type}</p>
+                          <p className="font-body text-[12px] text-[#B5ADA7]">{p.brand} · {p.type}</p>
                         </div>
                         <span className="font-display text-base font-light text-[#C17B5C] shrink-0">{p.price}</span>
                       </div>
-                      <p className="font-body text-[11px] text-[#9A8C82] mt-1">{p.reason}</p>
+                      <p className="font-body text-[12px] text-[#9A8C82] mt-1">{p.reason}</p>
                     </div>
                   </div>
                 ))}
@@ -307,7 +324,7 @@ export default function Result() {
             </div>
 
             <p className="font-body text-xs text-[#B5ADA7] mt-4">{record.date}</p>
-            <p className="font-body text-[11px] text-[#B5ADA7] mt-1">6 维度分析</p>
+            <p className="font-body text-[12px] text-[#B5ADA7] mt-1">6 维度分析</p>
 
             {/* Desktop Chat CTA */}
             <div className="mt-6 space-y-2">

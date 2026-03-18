@@ -108,7 +108,36 @@ export default function History() {
       </header>
 
       {/* Main */}
-      <div className="flex-1 flex overflow-hidden md:pb-0" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden md:pb-0" style={{ paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
+        {/* Ch6.1: Mobile filter pills */}
+        <div className="md:hidden flex gap-2 px-5 py-3 overflow-x-auto shrink-0 border-b border-[rgba(45,36,32,0.06)]" style={{ scrollbarWidth: "none" }}>
+          <button
+            onClick={() => { setFilterYear(null); setFilterMonth(null); }}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full font-body text-[13px] transition-all ${
+              !filterYear ? "bg-[#C17B5C] text-white font-medium" : "bg-[rgba(45,36,32,0.05)] text-[#7A6E68]"
+            }`}
+          >
+            全部
+          </button>
+          {Object.entries(yearGroups)
+            .sort(([a], [b]) => Number(b) - Number(a))
+            .flatMap(([year, months]) =>
+              months.sort((a, b) => b - a).map((month) => (
+                <button
+                  key={`${year}-${month}`}
+                  onClick={() => { setFilterYear(Number(year)); setFilterMonth(month); }}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full font-body text-[13px] transition-all ${
+                    filterYear === Number(year) && filterMonth === month
+                      ? "bg-[#C17B5C] text-white font-medium"
+                      : "bg-[rgba(45,36,32,0.05)] text-[#7A6E68]"
+                  }`}
+                >
+                  {month}月
+                </button>
+              ))
+            )}
+        </div>
+
         {/* Left: Filter Panel (desktop) */}
         <div className="hidden md:flex flex-col w-[220px] border-r border-[rgba(45,36,32,0.06)] overflow-y-auto px-4 py-4">
           <button
@@ -210,9 +239,9 @@ export default function History() {
                         className="card-warm p-4 flex items-center gap-4 cursor-pointer anim-fade-up"
                         onClick={() => setSelectedRecord(r)}
                       >
-                        {/* Date number */}
+                        {/* Date number - Ch6.2: adjusted font */}
                         <div className="w-10 text-center shrink-0">
-                          <span className="font-display text-2xl font-light text-[#2D2420]">{day}</span>
+                          <span className="font-display text-xl md:text-2xl font-light text-[#2D2420]">{day}</span>
                         </div>
 
                         {/* Vertical line */}
@@ -221,7 +250,7 @@ export default function History() {
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-body font-medium ${tagStyle(r.tag)}`}>
+                            <span className={`text-[12px] px-1.5 py-0.5 rounded-full font-body font-medium ${tagStyle(r.tag)}`}>
                               {r.tag}
                             </span>
                             <span className="font-body text-xs text-[#B5ADA7] truncate">{r.summary}</span>
@@ -242,9 +271,9 @@ export default function History() {
                           </div>
                         </div>
 
-                        {/* Score + Arrow */}
+                        {/* Score + Arrow - Ch6.2: adjusted font */}
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="font-display text-2xl font-light" style={{ color: scoreColor(r.score) }}>
+                          <span className="font-display text-xl md:text-2xl font-light" style={{ color: scoreColor(r.score) }}>
                             {r.score}
                           </span>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round">

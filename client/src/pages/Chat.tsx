@@ -13,7 +13,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import Logo from "@/components/Logo";
-import MobileTabBar from "@/components/MobileTabBar";
+// MobileTabBar removed per Ch3.1 - Chat is immersive experience
 
 interface Message {
   id: string;
@@ -21,6 +21,12 @@ interface Message {
   content: string;
   image?: string;
   isNew?: boolean;
+  timestamp: number;
+}
+
+function formatTime(ts: number) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
 }
 
 const analysisSteps = [
@@ -74,6 +80,7 @@ export default function Chat() {
           id: "welcome-from-result",
           role: "ai" as const,
           content: "您好！我已经看过您的皮肤分析报告了 📋\n\n您的综合评分为 82 分，整体状态良好。其中弹性紧致度表现优秀（91分），水分含量也很充足（88分）。毛孔细腻度（58分）和色素均匀度（65分）还有提升空间。\n\n您可以针对任何维度向我提问，我会给出个性化的建议。",
+          timestamp: Date.now(),
         },
       ];
     }
@@ -116,7 +123,7 @@ export default function Chat() {
   const addMessage = useCallback((role: "user" | "ai", content: string, image?: string) => {
     setMessages((prev) => [
       ...prev,
-      { id: `msg-${Date.now()}-${Math.random()}`, role, content, image, isNew: true },
+      { id: `msg-${Date.now()}-${Math.random()}`, role, content, image, isNew: true, timestamp: Date.now() },
     ]);
   }, []);
 
@@ -287,7 +294,7 @@ export default function Chat() {
       </header>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(140px + env(safe-area-inset-bottom, 0px))" }}>
+      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(100px + env(safe-area-inset-bottom, 0px))" }}>
         {isWelcome ? (
           /* Welcome Screen - Claude style centered */
           <div className="flex flex-col items-center justify-center h-full px-5 py-8">
@@ -311,21 +318,28 @@ export default function Chat() {
 
             {/* Upload area - cleaner */}
             <div
-              className="w-full max-w-sm border-2 border-dashed border-[rgba(193,123,92,0.2)] rounded-2xl p-8 text-center cursor-pointer hover:border-[rgba(193,123,92,0.4)] hover:bg-[rgba(193,123,92,0.02)] transition-all active:scale-[0.98] anim-fade-up d-300"
+              className="w-full max-w-sm rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform anim-fade-up d-300"
               onClick={() => fileInputRef.current?.click()}
+              style={{
+                background: "linear-gradient(145deg, #F8F0E8 0%, #F0E4D8 50%, #EBD9CC 100%)",
+                boxShadow: "0 2px 16px rgba(193,123,92,0.1), 0 0 0 1px rgba(193,123,92,0.08)",
+              }}
             >
-              <div
-                className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                style={{ background: "rgba(193,123,92,0.08)" }}
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
+              <div className="flex flex-col items-center py-8 px-6">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: "linear-gradient(135deg, #C17B5C, #D4956F)", boxShadow: "0 4px 14px rgba(193,123,92,0.3)" }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                </div>
+                <p className="font-body text-[14px] font-medium text-[#2D2420] mb-1">上传面部照片</p>
+                <p className="font-body text-[12px] text-[#9A8C82]">正面清晰照 · JPG / PNG</p>
+                <div className="mt-4 px-4 py-2 rounded-full"
+                  style={{ background: "rgba(193,123,92,0.12)", border: "1px solid rgba(193,123,92,0.18)" }}>
+                  <span className="font-body text-[13px] text-[#C17B5C] font-medium">点击选择照片</span>
+                </div>
               </div>
-              <p className="font-body text-sm text-[#7A6E68] mb-1">点击或拖拽上传照片</p>
-              <p className="font-body text-[11px] text-[#B5ADA7]">支持 JPG、PNG，建议正面清晰照片</p>
             </div>
 
             {/* Quick questions */}
@@ -369,6 +383,7 @@ export default function Chat() {
                       <p className="font-body text-[13.5px] leading-[1.7] text-[#2D2420] whitespace-pre-line" style={{ fontWeight: 350 }}>
                         {msg.content}
                       </p>
+                      <p className="font-body text-[12px] text-[#C5BBB3] mt-1.5">{formatTime(msg.timestamp)}</p>
                     </div>
                   </div>
                 ) : (
@@ -394,6 +409,7 @@ export default function Chat() {
                           {msg.content}
                         </p>
                       </div>
+                      <p className="font-body text-[12px] text-[#C5BBB3] mt-1.5 text-right">{formatTime(msg.timestamp)}</p>
                     </div>
                   </div>
                 )}
@@ -448,9 +464,23 @@ export default function Chat() {
                   </svg>
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <p className="font-body text-[10px] text-[#B5ADA7] mb-3 uppercase tracking-wider">
+                  <p className="font-body text-[12px] text-[#B5ADA7] mb-3 uppercase tracking-wider">
                     AI 分析进度
                   </p>
+                  {/* Progress Ring (Ch3.3) */}
+                  <div className="flex justify-center mb-4">
+                    <div className="relative w-16 h-16">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
+                        <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(45,36,32,0.06)" strokeWidth="4" />
+                        <circle cx="32" cy="32" r="28" fill="none" stroke="#C17B5C" strokeWidth="4" strokeLinecap="round"
+                          strokeDasharray={`${((Math.min(analysisStep + 1, 5)) / 5) * 175.9} 175.9`}
+                          style={{ transition: "stroke-dasharray 0.8s cubic-bezier(0.22, 1, 0.36, 1)" }} />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="font-display text-[16px] font-light text-[#C17B5C]">{Math.min(analysisStep + 1, 5)}/5</span>
+                      </div>
+                    </div>
+                  </div>
                   <div className="space-y-2.5">
                     {analysisSteps.map((step, i) => {
                       const isDone = i < analysisStep;
@@ -458,7 +488,7 @@ export default function Chat() {
                       return (
                         <div key={i} className="flex items-center gap-2.5">
                           <span
-                            className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-body transition-all duration-300"
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-[12px] font-body transition-all duration-300"
                             style={{
                               background: isDone
                                 ? "#C17B5C"
@@ -499,13 +529,14 @@ export default function Chat() {
 
       {/* Input Area - Claude style: larger, centered, with disclaimer */}
       <div
-        className="fixed bottom-[56px] md:bottom-0 left-0 right-0 z-40"
+        className="fixed bottom-0 left-0 right-0 z-40"
         style={{
           background: "linear-gradient(to top, rgba(242,237,230,1) 70%, rgba(242,237,230,0))",
           paddingTop: "20px",
         }}
       >
-        <div className="max-w-2xl mx-auto px-4 md:px-6 pb-2">
+        <div className="max-w-2xl mx-auto px-4 md:px-6"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)" }}>
           {/* Input box */}
           <div
             className="flex items-end gap-2 px-3 py-2 rounded-2xl transition-all"
@@ -568,13 +599,12 @@ export default function Chat() {
           </div>
 
           {/* Disclaimer - like ChatGPT/Claude */}
-          <p className="text-center font-body text-[11px] text-[#C5BBB3] mt-2 mb-1 leading-relaxed" style={{ fontWeight: 300 }}>
+          <p className="text-center font-body text-[12px] text-[#C5BBB3] mt-2 mb-1 leading-relaxed" style={{ fontWeight: 300 }}>
             芯颜 AI 的分析结果仅供参考，不构成医疗建议。如有皮肤问题请咨询专业皮肤科医生。
           </p>
         </div>
       </div>
 
-      <MobileTabBar />
     </div>
   );
 }

@@ -1,11 +1,15 @@
-# Test Notes - Mobile Flow Fix
+# Test Notes - Post Full Optimization
 
-## Desktop Home - OK
-- Desktop layout uses page-locked, looks perfect
-- Hero image, floating cards, nav all working
+## Desktop Home ✓
+- Logo + nav + 免费检测 + user icon visible
+- "咨询专家" weakened to text link (Ch9.1) ✓
+- Floating cards with softer shadows (Ch9.2) ✓
+- Stats row: 98% / 30s / 12+ ✓
 
-## Mobile Home - Fixed
-- Changed from page-locked to natural flow (min-h-[100dvh] flex-col)
-- Removed flex-1 spacer that caused huge white gap
-- Content flows naturally without viewport lock
-- Bottom padding accounts for TabBar + safe area
+## Need to test:
+- Chat page (Ch3 changes)
+- Result page (Ch4 changes)
+- Calendar page (Ch5 changes)
+- History page (Ch6 changes)
+- Profile page (Ch7 changes)
+- TabBar (Ch8 changes)
