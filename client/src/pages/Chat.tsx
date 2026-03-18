@@ -35,7 +35,19 @@ const quickQuestions = [
 
 export default function Chat() {
   const [, setLocation] = useLocation();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const fromResult = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("from") === "result";
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (fromResult) {
+      return [
+        {
+          id: "welcome-from-result",
+          role: "ai" as const,
+          content: "您好！我已经看过您的皮肤分析报告了。您可以针对报告中的任何问题向我提问，比如如何改善某个维度的评分、日常护肤步骤建议，或者产品选择方面的疑问。请随时告诉我您想了解什么！",
+        },
+      ];
+    }
+    return [];
+  });
   const [inputText, setInputText] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(-1);
@@ -143,7 +155,7 @@ export default function Chat() {
     [handleImageUpload]
   );
 
-  const isWelcome = messages.length === 0 && !isAnalyzing;
+  const isWelcome = messages.length === 0 && !isAnalyzing && !fromResult;
 
   return (
     <div

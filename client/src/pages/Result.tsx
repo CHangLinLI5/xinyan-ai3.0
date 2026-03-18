@@ -232,6 +232,15 @@ export default function Result() {
       {/* Bottom Action Bar */}
       <div className="border-t border-[rgba(45,36,32,0.06)] px-5 py-3 flex gap-3 justify-center bg-[rgba(242,237,230,0.8)] backdrop-blur-sm z-10 pb-[calc(0.75rem+72px)] md:pb-3">
         <button onClick={() => setLocation("/chat")} className="btn-primary">重新分析</button>
+        <button
+          onClick={() => { window.location.href = "/chat?from=result"; }}
+          className="inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 font-body text-sm font-medium transition-all duration-200 bg-[#2D2420] text-[#F2EDE6] hover:bg-[#3D342F] active:scale-[0.97]"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          和芯颜AI聊天
+        </button>
         <button className="btn-ghost" onClick={() => toast("报告已保存到本地")}>保存报告</button>
       </div>
 
