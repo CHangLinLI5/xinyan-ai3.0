@@ -57,16 +57,18 @@ export default function Profile() {
     <div className="page-locked flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] bg-[rgba(242,237,230,0.8)] backdrop-blur-sm z-10">
-        <Logo size="sm" />
         <button
           onClick={() => setLocation("/")}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[rgba(45,36,32,0.06)] transition-colors"
+          className="flex items-center gap-1 font-body text-sm text-[#7A6E68] hover:text-[#C17B5C] transition-colors"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A6E68" strokeWidth="2" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <polyline points="15 18 9 12 15 6" />
           </svg>
+          返回
         </button>
+        <Logo size="sm" />
+        {/* Right placeholder to keep Logo centered */}
+        <div className="w-10" />
       </header>
 
       {/* Content */}
