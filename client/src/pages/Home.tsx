@@ -2,8 +2,8 @@
  * Home.tsx — 首页
  * Design: Warm Ivory Minimalism
  * 
- * 移动端：无 hero 图片，紧凑上传区 + 6维度标签 + 快捷提问胶囊 + 小统计
- * 桌面端：保留左文右图不对称布局 + 浮动卡片
+ * 移动端：精致上传卡片 + emoji 快捷提问 + 芯颜小贴士 + AI 聊天入口
+ * 桌面端：左文右图不对称布局 + 浮动毛玻璃卡片 + 精致导航
  */
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
@@ -23,10 +23,17 @@ const metrics = [
 ];
 
 const quickQuestions = [
-  "适合什么护肤品？",
-  "改善毛孔粗大",
-  "敏感肌护理",
-  "美白淡斑方法",
+  { text: "适合什么护肤品？", emoji: "🧴" },
+  { text: "改善毛孔粗大", emoji: "🔍" },
+  { text: "敏感肌护理", emoji: "🌸" },
+  { text: "美白淡斑方法", emoji: "✨" },
+];
+
+const skinTips = [
+  "每天涂抹防晒霜是抗衰老最有效的方式之一",
+  "洁面后 60 秒内使用精华液，吸收效果最佳",
+  "充足的睡眠比昂贵的护肤品更能改善肤质",
+  "维生素 C 精华搭配防晒，美白效果翻倍",
 ];
 
 function useCountUp(target: number, duration = 1200) {
@@ -53,6 +60,8 @@ export default function Home() {
   const score = useCountUp(82);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [tipIndex] = useState(() => Math.floor(Math.random() * skinTips.length));
+  const [activeNav, setActiveNav] = useState<string | null>(null);
 
   const handleImageUpload = useCallback(
     (file: File) => {
@@ -128,7 +137,7 @@ export default function Home() {
           <Logo />
           <button
             onClick={() => setLocation("/profile")}
-            className="w-8 h-8 rounded-full bg-[rgba(193,123,92,0.1)] flex items-center justify-center"
+            className="w-8 h-8 rounded-full bg-[rgba(193,123,92,0.08)] flex items-center justify-center"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -138,49 +147,58 @@ export default function Home() {
         </header>
 
         {/* Greeting */}
-        <div className="px-5 pt-4 pb-2 anim-fade-up">
-          <h1 className="font-display text-[1.6rem] font-light text-[#2D2420] leading-tight">
+        <div className="px-5 pt-3 pb-1 anim-fade-up">
+          <h1 className="font-display text-[1.5rem] font-light text-[#2D2420] leading-tight">
             你好，我是<span className="text-clay-gradient">芯颜 AI</span>～
           </h1>
-          <p className="font-body text-[13px] text-[#9A8C82] mt-2 leading-relaxed" style={{ fontWeight: 300 }}>
-            你的专属皮肤智能分析助手，30 秒了解肌肤状态
+          <p className="font-body text-[13px] text-[#9A8C82] mt-1.5 leading-relaxed" style={{ fontWeight: 300 }}>
+            你的专属皮肤智能分析助手
           </p>
         </div>
 
-        {/* Upload Card */}
-        <div className="px-5 mt-4 mb-6 anim-fade-up d-100">
+        {/* Upload Card - Solid gradient, more premium feel */}
+        <div className="px-5 mt-4 mb-5 anim-fade-up d-100">
           <div
             className="relative rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
             onClick={() => fileInputRef.current?.click()}
             style={{
-              background: "linear-gradient(135deg, rgba(193,123,92,0.06) 0%, rgba(193,123,92,0.02) 100%)",
-              border: "1.5px dashed rgba(193,123,92,0.2)",
+              background: "linear-gradient(145deg, #F8F0E8 0%, #F0E4D8 50%, #EBD9CC 100%)",
+              boxShadow: "0 2px 12px rgba(193,123,92,0.08), 0 0 0 1px rgba(193,123,92,0.06)",
             }}
           >
-            <div className="flex flex-col items-center py-8 px-6">
+            <div className="flex flex-col items-center py-7 px-6 relative">
+              {/* Decorative circles */}
+              <div className="absolute top-3 right-4 w-20 h-20 rounded-full opacity-[0.04]" style={{ background: "#C17B5C" }} />
+              <div className="absolute bottom-2 left-6 w-12 h-12 rounded-full opacity-[0.03]" style={{ background: "#C17B5C" }} />
+              
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
                 style={{
                   background: "linear-gradient(135deg, #C17B5C 0%, #D4956F 100%)",
-                  boxShadow: "0 6px 20px rgba(193,123,92,0.25)",
+                  boxShadow: "0 4px 14px rgba(193,123,92,0.3)",
                 }}
               >
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
               </div>
-              <p className="font-body text-[15px] font-medium text-[#2D2420]">上传面部照片</p>
-              <p className="font-body text-[12px] text-[#B5ADA7] mt-1">正面清晰照片 · 支持 JPG / PNG</p>
-              <div className="flex items-center gap-4 mt-4">
+              <p className="font-body text-[14px] font-medium text-[#2D2420]">上传面部照片</p>
+              <p className="font-body text-[11px] text-[#9A8C82] mt-0.5">正面清晰照 · JPG / PNG</p>
+              
+              {/* Stats row with dividers */}
+              <div className="flex items-center mt-4 gap-0">
                 {[
                   { num: "98%", label: "准确率" },
                   { num: "30s", label: "出结果" },
                   { num: "6项", label: "维度" },
-                ].map((s) => (
-                  <div key={s.label} className="flex items-center gap-1">
-                    <span className="font-body text-[11px] text-[#C17B5C] font-medium">{s.num}</span>
-                    <span className="font-body text-[10px] text-[#B5ADA7]">{s.label}</span>
+                ].map((s, i) => (
+                  <div key={s.label} className="flex items-center">
+                    {i > 0 && <div className="w-px h-3 bg-[rgba(193,123,92,0.15)] mx-3" />}
+                    <div className="flex items-center gap-1">
+                      <span className="font-body text-[11px] text-[#C17B5C] font-semibold">{s.num}</span>
+                      <span className="font-body text-[10px] text-[#B5ADA7]">{s.label}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -188,37 +206,57 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Questions */}
-        <div className="px-5 mb-6 anim-fade-up d-200">
-          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-3">或者直接问我</p>
+        {/* Quick Questions with emoji and richer colors */}
+        <div className="px-5 mb-4 anim-fade-up d-200">
+          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">或者直接问我</p>
           <div className="flex flex-wrap gap-2">
             {quickQuestions.map((q, i) => {
               const pillStyles = [
-                { bg: "rgba(193,123,92,0.10)", border: "rgba(193,123,92,0.18)", text: "#8B5E3C" },
-                { bg: "rgba(180,148,120,0.12)", border: "rgba(180,148,120,0.20)", text: "#7A6040" },
-                { bg: "rgba(160,120,100,0.10)", border: "rgba(160,120,100,0.16)", text: "#6B4F3A" },
-                { bg: "rgba(210,160,130,0.12)", border: "rgba(210,160,130,0.20)", text: "#8C6545" },
+                { bg: "linear-gradient(135deg, rgba(193,123,92,0.12) 0%, rgba(193,123,92,0.06) 100%)", border: "rgba(193,123,92,0.18)", text: "#8B5E3C" },
+                { bg: "linear-gradient(135deg, rgba(168,130,100,0.14) 0%, rgba(168,130,100,0.06) 100%)", border: "rgba(168,130,100,0.20)", text: "#6B5030" },
+                { bg: "linear-gradient(135deg, rgba(180,155,130,0.13) 0%, rgba(180,155,130,0.05) 100%)", border: "rgba(180,155,130,0.18)", text: "#6B5540" },
+                { bg: "linear-gradient(135deg, rgba(200,150,110,0.14) 0%, rgba(200,150,110,0.06) 100%)", border: "rgba(200,150,110,0.20)", text: "#7A5530" },
               ];
               const s = pillStyles[i % pillStyles.length];
               return (
                 <button
-                  key={q}
+                  key={q.text}
                   onClick={() => setLocation("/chat")}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
                   style={{
                     background: s.bg,
                     border: `1px solid ${s.border}`,
                     color: s.text,
                   }}
                 >
-                  {q}
+                  <span className="text-[13px]">{q.emoji}</span>
+                  {q.text}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* AI Chat Entry */}
+        {/* Skin Tip Card - fills the gap */}
+        <div className="px-5 mb-4 anim-fade-up d-250">
+          <div
+            className="rounded-xl px-4 py-3.5 flex items-start gap-3"
+            style={{
+              background: "linear-gradient(135deg, rgba(193,123,92,0.04) 0%, rgba(242,237,230,0.8) 100%)",
+              border: "1px solid rgba(193,123,92,0.06)",
+            }}
+          >
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: "rgba(193,123,92,0.08)" }}>
+              <span className="text-[14px]">💡</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-body text-[10px] text-[#C17B5C] font-medium tracking-wider mb-1">芯颜小贴士</p>
+              <p className="font-body text-[12px] text-[#5A4F49] leading-relaxed">{skinTips[tipIndex]}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Chat Entry - bottom */}
         <div className="px-5 mt-auto mb-4 anim-fade-up d-300">
           <button
             onClick={() => setLocation("/chat")}
@@ -241,23 +279,35 @@ export default function Home() {
 
       {/* ===== DESKTOP LAYOUT (hidden md:flex) ===== */}
       <div className="hidden md:flex flex-col h-full">
-        {/* Desktop Top Nav */}
-        <header className="relative z-20 flex items-center justify-between px-8 py-4">
+        {/* Desktop Top Nav — refined with hover underline */}
+        <header className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-4">
           <Logo />
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-8">
             {navLinks.map((link) => (
               <button
                 key={link.path}
                 onClick={() => setLocation(link.path)}
-                className="font-body text-sm text-[#7A6E68] hover:text-[#C17B5C] transition-colors"
+                onMouseEnter={() => setActiveNav(link.path)}
+                onMouseLeave={() => setActiveNav(null)}
+                className="relative font-body text-[13px] text-[#7A6E68] hover:text-[#C17B5C] transition-colors py-1"
+                style={{ fontWeight: 400 }}
               >
                 {link.label}
+                {/* Hover underline indicator */}
+                <span
+                  className="absolute bottom-0 left-1/2 h-[1.5px] rounded-full transition-all duration-300"
+                  style={{
+                    width: activeNav === link.path ? "60%" : "0%",
+                    transform: "translateX(-50%)",
+                    background: "linear-gradient(90deg, transparent, #C17B5C, transparent)",
+                  }}
+                />
               </button>
             ))}
           </nav>
           <button
             onClick={() => setLocation("/chat")}
-            className="btn-primary text-sm"
+            className="btn-primary text-[13px] px-5 py-2"
           >
             免费检测
           </button>
@@ -273,7 +323,7 @@ export default function Home() {
 
             <h1 className="font-display text-[clamp(2rem,5vw,3.5rem)] font-light leading-[1.15] text-[#2D2420] mb-5 anim-fade-up d-100">
               了解你的<br />
-              <span className="text-clay-gradient">皮肤状态</span>
+              <span className="text-clay-gradient font-display" style={{ fontStyle: "italic" }}>皮肤状态</span>
             </h1>
 
             <p className="font-body text-[15px] text-[#7A6E68] leading-relaxed max-w-md mb-6 anim-fade-up d-200" style={{ fontWeight: 300 }}>
@@ -282,47 +332,31 @@ export default function Home() {
 
             <div className="warm-divider max-w-md mb-6 anim-fade-up d-300" />
 
-            <div className="flex gap-3 mb-6 anim-fade-up d-300">
+            <div className="flex gap-3 items-center mb-8 anim-fade-up d-300">
               <button onClick={() => setLocation("/chat")} className="btn-primary">
                 开始检测
               </button>
-              <button className="btn-ghost" onClick={() => toast("专家咨询功能即将推出")}>咨询专家</button>
-            </div>
-
-            <div className="flex gap-5 mb-8 anim-fade-up d-400">
               <button
-                onClick={() => setLocation("/calendar")}
-                className="flex items-center gap-1.5 font-body text-xs text-[#9A8C82] hover:text-[#C17B5C] transition-colors"
+                className="font-body text-[13px] text-[#9A8C82] hover:text-[#C17B5C] transition-colors px-4 py-2"
+                onClick={() => toast("专家咨询功能即将推出")}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                护肤日历
-              </button>
-              <button
-                onClick={() => setLocation("/history")}
-                className="flex items-center gap-1.5 font-body text-xs text-[#9A8C82] hover:text-[#C17B5C] transition-colors"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                历史记录
+                咨询专家 →
               </button>
             </div>
 
-            <div className="flex gap-8 anim-fade-up d-500">
+            {/* Stats with dividers */}
+            <div className="flex items-center gap-0 anim-fade-up d-400">
               {[
                 { num: "98%", label: "准确率" },
                 { num: "30s", label: "出结果" },
                 { num: "12+", label: "检测维度" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex flex-col">
-                  <span className="font-display text-xl font-light text-[#2D2420]">{stat.num}</span>
-                  <span className="label-sm mt-0.5">{stat.label}</span>
+              ].map((stat, i) => (
+                <div key={stat.label} className="flex items-center">
+                  {i > 0 && <div className="w-px h-8 bg-[rgba(45,36,32,0.08)] mx-6" />}
+                  <div className="flex flex-col">
+                    <span className="font-display text-xl font-light text-[#2D2420]">{stat.num}</span>
+                    <span className="label-sm mt-0.5">{stat.label}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -338,13 +372,24 @@ export default function Home() {
                 style={{ filter: "brightness(1.02)" }}
               />
               <div
-                className="absolute inset-y-0 left-0 w-24"
-                style={{ background: "linear-gradient(90deg, #F2EDE6 0%, transparent 100%)" }}
+                className="absolute inset-y-0 left-0 w-32"
+                style={{ background: "linear-gradient(90deg, #F2EDE6 0%, rgba(242,237,230,0.6) 50%, transparent 100%)" }}
               />
             </div>
 
             {/* Floating Score Card */}
-            <div className="absolute top-12 left-8 glass-card p-5 anim-scale-in d-400" style={{ width: 180 }}>
+            <div
+              className="absolute top-12 left-8 p-5 anim-scale-in d-400"
+              style={{
+                width: 180,
+                background: "rgba(255,255,255,0.75)",
+                backdropFilter: "blur(20px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+                borderRadius: "16px",
+                border: "1px solid rgba(255,255,255,0.5)",
+                boxShadow: "0 8px 32px rgba(45,36,32,0.08), 0 2px 8px rgba(45,36,32,0.04)",
+              }}
+            >
               <p className="label-sm mb-2">综合评分</p>
               <div className="flex items-baseline gap-1">
                 <span className="font-display text-[3.2rem] font-light leading-none text-clay-gradient">
@@ -368,7 +413,18 @@ export default function Home() {
             </div>
 
             {/* Floating Metrics Card */}
-            <div className="absolute bottom-16 right-8 glass-card p-4 anim-scale-in d-600" style={{ width: 200 }}>
+            <div
+              className="absolute bottom-16 right-8 p-4 anim-scale-in d-600"
+              style={{
+                width: 200,
+                background: "rgba(255,255,255,0.72)",
+                backdropFilter: "blur(20px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+                borderRadius: "14px",
+                border: "1px solid rgba(255,255,255,0.45)",
+                boxShadow: "0 8px 32px rgba(45,36,32,0.08), 0 2px 8px rgba(45,36,32,0.04)",
+              }}
+            >
               <p className="label-sm mb-3">维度分析</p>
               <div className="space-y-2.5">
                 {metrics.map((m) => (
@@ -382,7 +438,7 @@ export default function Home() {
                         className="h-full rounded-full transition-all duration-900"
                         style={{
                           width: `${m.value}%`,
-                          background: `rgba(193, 123, 92, ${0.4 + (m.value / 100) * 0.5})`,
+                          background: `linear-gradient(90deg, rgba(193,123,92,${0.3 + (m.value / 100) * 0.4}), rgba(193,123,92,${0.5 + (m.value / 100) * 0.4}))`,
                         }}
                       />
                     </div>
@@ -393,15 +449,34 @@ export default function Home() {
           </div>
         </main>
 
-        {/* Desktop Footer */}
-        <footer className="relative z-10 flex items-center justify-between px-8 py-3 border-t border-[rgba(45,36,32,0.06)]">
+        {/* Desktop Footer — refined */}
+        <footer className="relative z-10 flex items-center justify-between px-8 lg:px-12 py-3" style={{ borderTop: "1px solid rgba(193,123,92,0.06)" }}>
           <p className="font-body text-[11px] text-[#B5ADA7]">© 2025 芯颜 AI · 专业皮肤智能分析</p>
-          <div className="flex items-center gap-1.5">
-            <span
-              className="w-1.5 h-1.5 rounded-full bg-[#C17B5C]"
-              style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
-            />
-            <span className="font-body text-[11px] text-[#B5ADA7]">服务运行中</span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setLocation("/calendar")}
+              className="font-body text-[11px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
+            >
+              护肤日历
+            </button>
+            <span className="text-[#E0D8D0]">·</span>
+            <button
+              onClick={() => setLocation("/history")}
+              className="font-body text-[11px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors"
+            >
+              历史记录
+            </button>
+            <span className="text-[#E0D8D0]">·</span>
+            <div className="flex items-center gap-1.5">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, #C17B5C, #D4956F)",
+                  animation: "pulse-dot 2s ease-in-out infinite",
+                }}
+              />
+              <span className="font-body text-[11px] text-[#B5ADA7]">服务运行中</span>
+            </div>
           </div>
         </footer>
       </div>
