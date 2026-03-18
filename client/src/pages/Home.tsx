@@ -140,10 +140,10 @@ export default function Home() {
         {/* Greeting */}
         <div className="px-5 pt-4 pb-2 anim-fade-up">
           <h1 className="font-display text-[1.6rem] font-light text-[#2D2420] leading-tight">
-            你好，<span className="text-clay-gradient">芯颜</span>
+            你好，我是<span className="text-clay-gradient">芯颜 AI</span>～
           </h1>
           <p className="font-body text-[13px] text-[#9A8C82] mt-2 leading-relaxed" style={{ fontWeight: 300 }}>
-            AI 皮肤智能分析，30 秒了解你的肌肤状态
+            你的专属皮肤智能分析助手，30 秒了解肌肤状态
           </p>
         </div>
 
@@ -190,21 +190,31 @@ export default function Home() {
 
         {/* Quick Questions */}
         <div className="px-5 mb-6 anim-fade-up d-200">
-          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-3">或者直接问芯颜</p>
+          <p className="font-body text-[11px] text-[#B5ADA7] tracking-wider mb-3">或者直接问我</p>
           <div className="flex flex-wrap gap-2">
-            {quickQuestions.map((q) => (
-              <button
-                key={q}
-                onClick={() => setLocation("/chat")}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-body text-[#5A4F49] hover:text-[#C17B5C] transition-colors active:scale-[0.96]"
-                style={{
-                  background: "rgba(253,250,247,0.9)",
-                  border: "1px solid rgba(45,36,32,0.06)",
-                }}
-              >
-                {q}
-              </button>
-            ))}
+            {quickQuestions.map((q, i) => {
+              const pillStyles = [
+                { bg: "rgba(193,123,92,0.10)", border: "rgba(193,123,92,0.18)", text: "#8B5E3C" },
+                { bg: "rgba(180,148,120,0.12)", border: "rgba(180,148,120,0.20)", text: "#7A6040" },
+                { bg: "rgba(160,120,100,0.10)", border: "rgba(160,120,100,0.16)", text: "#6B4F3A" },
+                { bg: "rgba(210,160,130,0.12)", border: "rgba(210,160,130,0.20)", text: "#8C6545" },
+              ];
+              const s = pillStyles[i % pillStyles.length];
+              return (
+                <button
+                  key={q}
+                  onClick={() => setLocation("/chat")}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-body transition-all active:scale-[0.96] hover:shadow-sm"
+                  style={{
+                    background: s.bg,
+                    border: `1px solid ${s.border}`,
+                    color: s.text,
+                  }}
+                >
+                  {q}
+                </button>
+              );
+            })}
           </div>
         </div>
 
