@@ -1,9 +1,9 @@
 /*
  * Home.tsx — 首页（以皮肤检测为核心）
- * Design: Warm Ivory Minimalism + Lively Motion
+ * Design: Warm Ivory Minimalism + Organic Shapes
  *
- * 层级：检测入口 → 今日状态 → 工具入口
- * 增强：浮动装饰、呼吸光效、交错动画、悬浮反馈
+ * 层级：检测入口(大) → 今日状态(紧凑) → 工具入口 → 发现
+ * 形状：大圆角、胶囊形、有机曲线，避免方块感
  */
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
@@ -28,6 +28,14 @@ function getGreeting(): string {
   return "晚上好";
 }
 
+function getTimeEmoji(): string {
+  const h = new Date().getHours();
+  if (h < 6) return "🌙";
+  if (h < 12) return "🌤";
+  if (h < 18) return "☀️";
+  return "🌙";
+}
+
 function formatDate(): string {
   const d = new Date();
   const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -38,17 +46,14 @@ function formatDate(): string {
 function FloatingOrbs() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-      {/* Large warm orb top-right */}
       <div
         className="absolute -top-20 -right-20 w-64 h-64 rounded-full anim-float-slow opacity-[0.04]"
         style={{ background: "radial-gradient(circle, #C17B5C 0%, transparent 70%)" }}
       />
-      {/* Small orb left */}
       <div
         className="absolute top-[40%] -left-10 w-32 h-32 rounded-full anim-breathe"
         style={{ background: "radial-gradient(circle, #D4967A 0%, transparent 70%)", animationDelay: "1s" }}
       />
-      {/* Tiny orb bottom */}
       <div
         className="absolute bottom-[20%] right-[15%] w-16 h-16 rounded-full anim-float"
         style={{ background: "radial-gradient(circle, #C17B5C 0%, transparent 70%)", opacity: 0.05, animationDelay: "2s" }}
@@ -121,53 +126,30 @@ export default function Home() {
     {
       label: "皮肤日记",
       path: "/diary",
-      gradient: "linear-gradient(135deg, #F0E4D8 0%, #E8D8CA 100%)",
+      gradient: "linear-gradient(145deg, #F5EBE0 0%, #ECDDD0 100%)",
       iconColor: "#C17B5C",
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-      ),
+      emoji: "📔",
     },
     {
       label: "护肤方案",
       path: "/routine",
-      gradient: "linear-gradient(135deg, #E4EDE4 0%, #D4E2D4 100%)",
+      gradient: "linear-gradient(145deg, #E8F0E8 0%, #D8E8D8 100%)",
       iconColor: "#5A8A5A",
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 11l3 3L22 4" />
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-        </svg>
-      ),
+      emoji: "✨",
     },
     {
       label: "成分分析",
       path: "/ingredients",
-      gradient: "linear-gradient(135deg, #E0E4F0 0%, #D0D6E8 100%)",
+      gradient: "linear-gradient(145deg, #E8ECF5 0%, #D8DEF0 100%)",
       iconColor: "#6A7AB0",
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 3h6v11l-3 3-3-3z" />
-          <path d="M6 14l-3 3v4h18v-4l-3-3" />
-        </svg>
-      ),
+      emoji: "🧪",
     },
     {
       label: "冲突检测",
       path: "/conflict",
-      gradient: "linear-gradient(135deg, #F0E8E0 0%, #E8DCD0 100%)",
+      gradient: "linear-gradient(145deg, #F5EDE0 0%, #ECE0D0 100%)",
       iconColor: "#B08050",
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-          <line x1="12" y1="9" x2="12" y2="13" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-      ),
+      emoji: "🔍",
     },
   ];
 
@@ -211,7 +193,7 @@ export default function Home() {
         onDrop={handleDrop}
       >
         {/* ===== Header ===== */}
-        <header className="flex items-center justify-between px-5 md:px-8 pt-[env(safe-area-inset-top,12px)] pb-2 max-w-2xl mx-auto w-full anim-fade-in">
+        <header className="flex items-center justify-between px-5 md:px-8 pt-[env(safe-area-inset-top,12px)] pb-1 max-w-2xl mx-auto w-full anim-fade-in">
           <Logo />
           <button
             onClick={() => setLocation("/profile")}
@@ -227,54 +209,68 @@ export default function Home() {
         {/* ===== Content ===== */}
         <main className="max-w-2xl mx-auto px-5 md:px-8 pb-4">
 
-          {/* Section 1: Greeting + Detection CTA */}
-          <section className="mt-4 anim-slide-up">
+          {/* Greeting */}
+          <section className="mt-3 anim-slide-up">
             <p className="font-body text-[13px] text-[#B5ADA7] tracking-wide">{formatDate()}</p>
-            <h1 className="font-display text-[1.5rem] text-[#2D2420] mt-1 leading-tight">
+            <h1 className="font-display text-[1.5rem] text-[#2D2420] mt-0.5 leading-tight">
               {getGreeting()}
               <span className="inline-block ml-2 anim-float" style={{ animationDuration: "2s" }}>
-                {new Date().getHours() < 12 ? "🌤" : new Date().getHours() < 18 ? "☀️" : "🌙"}
+                {getTimeEmoji()}
               </span>
             </h1>
+          </section>
 
-            {/* Detection CTA — with glow + animated gradient */}
+          {/* ===== HERO: Detection CTA — BIG, organic shape ===== */}
+          <section className="mt-5 anim-slide-up d-100">
             <button
               onClick={() => setLocation("/chat")}
-              className="w-full mt-5 rounded-2xl overflow-hidden text-left group glow-clay anim-gradient-shift"
+              className="w-full overflow-hidden text-left group glow-clay anim-gradient-shift"
               style={{
+                borderRadius: "28px",
                 background: "linear-gradient(145deg, #C17B5C 0%, #D4956F 30%, #E0A882 60%, #D4956F 100%)",
                 backgroundSize: "200% 200%",
               }}
             >
-              <div className="relative px-6 py-7 md:py-9">
-                {/* Animated decorative circles */}
-                <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full opacity-[0.1] bg-white anim-breathe" />
-                <div className="absolute -bottom-4 -left-4 w-24 h-24 rounded-full opacity-[0.06] bg-white anim-float-slow" />
-                <div className="absolute top-3 right-[30%] w-3 h-3 rounded-full bg-white/10 anim-float" style={{ animationDelay: "0.5s" }} />
-                <div className="absolute bottom-4 right-[20%] w-2 h-2 rounded-full bg-white/15 anim-float" style={{ animationDelay: "1.5s" }} />
+              <div className="relative px-7 py-10 md:py-14">
+                {/* Decorative organic blobs */}
+                <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full opacity-[0.1] bg-white anim-breathe" />
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-[0.06] bg-white anim-float-slow" />
+                <div className="absolute top-6 right-[25%] w-4 h-4 rounded-full bg-white/10 anim-float" style={{ animationDelay: "0.5s" }} />
+                <div className="absolute bottom-8 right-[15%] w-3 h-3 rounded-full bg-white/15 anim-float" style={{ animationDelay: "1.5s" }} />
+                <div className="absolute top-[50%] right-[8%] w-2 h-2 rounded-full bg-white/10 anim-float" style={{ animationDelay: "2.5s" }} />
 
                 <div className="relative flex items-center gap-5">
-                  {/* Camera icon with ripple */}
+                  {/* Camera icon — large, pill-shaped container */}
                   <div className="relative shrink-0">
                     <div
-                      className="w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
-                      style={{ background: "rgba(255,255,255,0.2)" }}
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-[22px] flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500"
+                      style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(8px)" }}
                     >
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="md:w-9 md:h-9">
                         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                         <circle cx="12" cy="13" r="4" />
                       </svg>
                     </div>
                     {/* Pulse ring */}
-                    <div className="absolute inset-0 rounded-2xl border-2 border-white/20" style={{ animation: "ripple 2.5s ease-out infinite" }} />
+                    <div className="absolute inset-0 rounded-[22px] border-2 border-white/20" style={{ animation: "ripple 2.5s ease-out infinite" }} />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h2 className="font-display text-white text-[1.2rem] md:text-[1.35rem] tracking-wide">AI 皮肤检测</h2>
-                    <p className="font-body text-white/75 text-[13px] mt-1.5 leading-relaxed">上传面部照片，30秒生成专业分析报告</p>
+                    <h2 className="font-display text-white text-[1.4rem] md:text-[1.6rem] tracking-wide leading-tight">AI 皮肤检测</h2>
+                    <p className="font-body text-white/70 text-[13px] md:text-[14px] mt-2 leading-relaxed">上传面部照片，30秒生成专业分析报告</p>
+                    {/* Pill-shaped tags */}
+                    <div className="flex gap-2 mt-3">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-body text-white/90 font-medium" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}>
+                        📸 拍照检测
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-body text-white/90 font-medium" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}>
+                        ⚡ 30秒出报告
+                      </span>
+                    </div>
                   </div>
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 group-hover:translate-x-1 transition-all duration-300">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+
+                  <div className="shrink-0 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 group-hover:translate-x-1 transition-all duration-300">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </div>
@@ -283,66 +279,78 @@ export default function Home() {
             </button>
           </section>
 
-          {/* Section 2: Today Status */}
-          <section className="mt-6 anim-slide-up d-200">
-            <div className="rounded-2xl bg-[#EDE8E0] border border-[rgba(45,36,32,0.06)] p-5 hover-lift">
-              {/* Row 1: Routine progress */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-body text-[13px] text-[#7A6E68] font-medium">今日护肤</span>
-                    <span
-                      className="font-display text-[15px] font-medium"
-                      style={{ color: routinePct >= 100 ? "#4A9A6B" : "#C17B5C" }}
-                    >
-                      {routinePct}%
-                    </span>
-                  </div>
-                  <div className="h-2 bg-[rgba(45,36,32,0.04)] rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-1000 ease-out progress-animated"
-                      style={{
-                        width: `${routinePct}%`,
-                        background: routinePct >= 100
-                          ? "linear-gradient(90deg, #4A9A6B, #6BB88A)"
-                          : "linear-gradient(90deg, #C17B5C, #D4967A)",
-                      }}
+          {/* ===== Today Status — compact pill row ===== */}
+          <section className="mt-5 anim-slide-up d-200">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Routine pill */}
+              <button
+                onClick={() => setLocation("/routine")}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(135deg, rgba(237,232,224,0.8) 0%, rgba(232,226,217,0.9) 100%)",
+                  border: "1px solid rgba(45,36,32,0.06)",
+                }}
+              >
+                <span className="text-[13px]">☀️</span>
+                <span className="font-body text-[12px] text-[#7A6E68] font-medium">{routineProgress.am}/{routineProgress.amTotal}</span>
+                <div className="w-px h-3 bg-[rgba(45,36,32,0.08)]" />
+                <span className="text-[13px]">🌙</span>
+                <span className="font-body text-[12px] text-[#7A6E68] font-medium">{routineProgress.pm}/{routineProgress.pmTotal}</span>
+                {/* Mini progress arc */}
+                <div className="relative w-6 h-6 ml-0.5">
+                  <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(45,36,32,0.06)" strokeWidth="3" />
+                    <circle
+                      cx="18" cy="18" r="14" fill="none"
+                      stroke={routinePct >= 100 ? "#4A9A6B" : "#C17B5C"}
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeDasharray={`${routinePct * 0.88} 88`}
+                      className="transition-all duration-1000"
                     />
-                  </div>
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center font-body text-[8px] text-[#7A6E68] font-bold">{routinePct}</span>
                 </div>
+              </button>
+
+              {/* Streak pill */}
+              <div
+                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, rgba(193,123,92,0.06) 0%, rgba(193,123,92,0.1) 100%)",
+                  border: "1px solid rgba(193,123,92,0.08)",
+                }}
+              >
+                <span className="text-[13px]">🔥</span>
+                <span className="font-body text-[12px] text-[#C17B5C] font-semibold">{stats.streak}天</span>
               </div>
 
-              {/* Row 2: Stats chips */}
-              <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[rgba(45,36,32,0.05)]">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[rgba(255,255,255,0.5)]">
-                  <span className="text-[12px]">☀️</span>
-                  <span className="font-body text-[12px] text-[#7A6E68] font-medium">{routineProgress.am}/{routineProgress.amTotal}</span>
+              {/* Mood pill (if diary exists) */}
+              {todayDiary && (
+                <div
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-full"
+                  style={{
+                    background: "rgba(237,232,224,0.6)",
+                    border: "1px solid rgba(45,36,32,0.05)",
+                  }}
+                >
+                  <span className="text-[15px]">{MOOD_EMOJIS[todayDiary.mood]}</span>
+                  <span className="font-body text-[12px] text-[#7A6E68]">{MOOD_LABELS[todayDiary.mood]}</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[rgba(255,255,255,0.5)]">
-                  <span className="text-[12px]">🌙</span>
-                  <span className="font-body text-[12px] text-[#7A6E68] font-medium">{routineProgress.pm}/{routineProgress.pmTotal}</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[rgba(193,123,92,0.06)] ml-auto">
-                  <span className="text-[12px]">🔥</span>
-                  <span className="font-body text-[12px] text-[#C17B5C] font-semibold">{stats.streak}天</span>
-                </div>
-                {todayDiary && (
-                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[rgba(255,255,255,0.5)]">
-                    <span className="text-[14px]">{MOOD_EMOJIS[todayDiary.mood]}</span>
-                    <span className="font-body text-[12px] text-[#7A6E68]">{MOOD_LABELS[todayDiary.mood]}</span>
-                  </div>
-                )}
-              </div>
+              )}
 
-              {/* Row 3: Insight */}
+              {/* Insight pill */}
               {topInsight && (
                 <button
                   onClick={() => setLocation("/diary")}
-                  className="flex items-center gap-2 mt-3 pt-3 border-t border-[rgba(45,36,32,0.05)] w-full text-left group/insight"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-full transition-all duration-300 hover:shadow-sm hover:-translate-y-0.5 active:scale-[0.97]"
+                  style={{
+                    background: "rgba(193,123,92,0.04)",
+                    border: "1px solid rgba(193,123,92,0.08)",
+                  }}
                 >
-                  <div className="w-1 h-4 rounded-full bg-[#C17B5C] opacity-60 shrink-0" />
-                  <p className="font-body text-[12px] text-[#5A4F49] flex-1 truncate group-hover/insight:text-[#C17B5C] transition-colors">{topInsight}</p>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round" className="group-hover/insight:translate-x-0.5 group-hover/insight:stroke-[#C17B5C] transition-all">
+                  <span className="font-body text-[11px] text-[#5A4F49] truncate max-w-[160px]">{topInsight}</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2.5" strokeLinecap="round">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </button>
@@ -350,7 +358,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Section 3: Tools — with individual gradients and stagger */}
+          {/* ===== Tools — organic rounded cards ===== */}
           <section className="mt-6 anim-slide-up d-300">
             <p className="font-body text-[12px] text-[#B5ADA7] tracking-widest uppercase mb-3">护肤工具</p>
             <div className="grid grid-cols-4 gap-2.5 stagger-children">
@@ -358,33 +366,35 @@ export default function Home() {
                 <button
                   key={tool.path}
                   onClick={() => setLocation(tool.path)}
-                  className="flex flex-col items-center gap-2.5 py-4 px-2 rounded-2xl border border-[rgba(45,36,32,0.04)] hover-lift group/tool"
-                  style={{ background: tool.gradient }}
+                  className="flex flex-col items-center gap-2 py-4 px-2 border border-[rgba(45,36,32,0.04)] hover-lift group/tool active:scale-[0.95] transition-all duration-300"
+                  style={{ background: tool.gradient, borderRadius: "20px" }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center group-hover/tool:scale-110 transition-transform duration-300"
-                    style={{ background: "rgba(255,255,255,0.6)", color: tool.iconColor }}
-                  >
-                    {tool.icon}
-                  </div>
+                  <span className="text-[24px] group-hover/tool:scale-125 transition-transform duration-300 inline-block">{tool.emoji}</span>
                   <span className="font-body text-[11px] text-[#5A4F49] font-medium whitespace-nowrap">{tool.label}</span>
                 </button>
               ))}
             </div>
           </section>
 
-          {/* Section 4: Discover entry — with shimmer accent */}
-          <section className="mt-6 anim-slide-up d-400">
+          {/* ===== Discover entry — organic pill shape ===== */}
+          <section className="mt-5 anim-slide-up d-400">
             <button
               onClick={() => setLocation("/discover")}
-              className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left hover-lift group/discover relative overflow-hidden"
-              style={{ background: "linear-gradient(135deg, #EDE8E0 0%, #E8E2D9 100%)", border: "1px solid rgba(45,36,32,0.06)" }}
+              className="w-full flex items-center gap-4 px-5 py-4 text-left hover-lift group/discover relative overflow-hidden active:scale-[0.98] transition-all duration-300"
+              style={{
+                borderRadius: "22px",
+                background: "linear-gradient(135deg, #EDE8E0 0%, #E8E2D9 100%)",
+                border: "1px solid rgba(45,36,32,0.06)",
+              }}
             >
               {/* Shimmer overlay */}
               <div className="absolute inset-0 anim-shimmer pointer-events-none" />
 
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover/discover:scale-110 transition-transform duration-300" style={{ background: "rgba(193,123,92,0.08)" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="group-hover/discover:rotate-45 transition-transform duration-500">
+              <div
+                className="w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0 group-hover/discover:scale-110 group-hover/discover:rotate-12 transition-all duration-500"
+                style={{ background: "rgba(193,123,92,0.08)" }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
                 </svg>

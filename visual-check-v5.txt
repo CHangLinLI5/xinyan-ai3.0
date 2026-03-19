@@ -1,0 +1,11 @@
+Visual Check V5 - Bigger CTA, Compact Status, Rounded TabBar
+
+Home page (desktop view):
+- Detection CTA is significantly bigger now with rounded-[28px] corners, larger padding, pill-shaped tags
+- Today status is now compact pill-shaped row instead of a big card - much less visual weight
+- Tool cards have 20px border-radius, emoji icons instead of SVGs - more organic feel
+- Discover entry has 22px border-radius
+- TabBar not visible on desktop (correct)
+- Overall: much better hierarchy - CTA dominates, status is secondary, tools are tertiary
+
+Need to check mobile view for the floating pill TabBar.

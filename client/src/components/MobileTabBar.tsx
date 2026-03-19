@@ -1,7 +1,7 @@
 /*
  * MobileTabBar — 移动端底部导航
- * Design: Warm Ivory Minimalism + Lively Motion
- * 特色：选中态动画指示器、平滑过渡、检测按钮渐变
+ * Design: Warm Ivory + Organic Rounded
+ * 特色：浮动胶囊容器、圆润选中态、中心检测按钮圆形凸起
  */
 import { useLocation } from "wouter";
 
@@ -75,21 +75,69 @@ export default function MobileTabBar() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden flex justify-center"
       style={{
-        height: `calc(60px + env(safe-area-inset-bottom, 0px))`,
         paddingBottom: `env(safe-area-inset-bottom, 0px)`,
-        background: "rgba(253, 250, 247, 0.88)",
-        backdropFilter: "blur(20px) saturate(1.6)",
-        WebkitBackdropFilter: "blur(20px) saturate(1.6)",
-        borderTop: "1px solid rgba(45, 36, 32, 0.05)",
-        boxShadow: "0 -4px 24px rgba(45, 36, 32, 0.04)",
       }}
     >
-      <div className="flex items-center h-[60px]">
+      {/* Floating pill container */}
+      <div
+        className="flex items-center mx-3 mb-2 w-full max-w-md"
+        style={{
+          height: "64px",
+          borderRadius: "32px",
+          background: "rgba(253, 250, 247, 0.92)",
+          backdropFilter: "blur(24px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(24px) saturate(1.8)",
+          border: "1px solid rgba(45, 36, 32, 0.06)",
+          boxShadow: "0 8px 32px rgba(45, 36, 32, 0.08), 0 2px 8px rgba(45, 36, 32, 0.04)",
+        }}
+      >
         {tabs.map((tab) => {
           const isActive = getIsActive(location, tab.path);
           const isCenter = tab.isCenter;
+
+          if (isCenter) {
+            return (
+              <button
+                key={tab.path}
+                onClick={() => setLocation(tab.path)}
+                className="flex flex-col items-center justify-center flex-1 h-full transition-all duration-300"
+              >
+                {/* Raised circle button */}
+                <div
+                  className="flex items-center justify-center transition-all duration-400"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: "50%",
+                    marginTop: -16,
+                    background: isActive
+                      ? "linear-gradient(145deg, #C17B5C, #D4956F)"
+                      : "linear-gradient(145deg, rgba(193,123,92,0.12), rgba(193,123,92,0.06))",
+                    color: isActive ? "white" : "#C17B5C",
+                    boxShadow: isActive
+                      ? "0 6px 20px rgba(193,123,92,0.35), 0 2px 6px rgba(193,123,92,0.2)"
+                      : "0 2px 8px rgba(45,36,32,0.06)",
+                    transform: isActive ? "scale(1.05)" : "scale(1)",
+                  }}
+                >
+                  {tab.icon}
+                </div>
+                <span
+                  className="font-body transition-all duration-300"
+                  style={{
+                    fontSize: "10px",
+                    marginTop: 2,
+                    fontWeight: isActive ? 600 : 400,
+                    color: isActive ? "#C17B5C" : "#B5ADA7",
+                  }}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          }
 
           return (
             <button
@@ -97,28 +145,25 @@ export default function MobileTabBar() {
               onClick={() => setLocation(tab.path)}
               className="flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 group/tab"
             >
-              {/* Icon container */}
-              <div
-                className={`flex items-center justify-center transition-all duration-400 ${
-                  isCenter
-                    ? "w-11 h-11 rounded-2xl"
-                    : isActive
-                    ? "scale-110"
-                    : "group-hover/tab:scale-105"
-                }`}
-                style={
-                  isCenter
-                    ? {
-                        background: isActive
-                          ? "linear-gradient(145deg, #C17B5C, #D4956F)"
-                          : "rgba(193,123,92,0.08)",
-                        color: isActive ? "white" : "#C17B5C",
-                        boxShadow: isActive ? "0 4px 16px rgba(193,123,92,0.3)" : "none",
-                      }
-                    : { color: isActive ? "#C17B5C" : "#B5ADA7" }
-                }
-              >
-                {tab.icon}
+              {/* Icon with pill-shaped active background */}
+              <div className="relative flex items-center justify-center">
+                {isActive && (
+                  <div
+                    className="absolute inset-0 -mx-1.5 -my-0.5 rounded-full transition-all duration-400"
+                    style={{
+                      background: "rgba(193,123,92,0.08)",
+                      transform: "scale(1)",
+                    }}
+                  />
+                )}
+                <div
+                  className={`relative transition-all duration-300 ${
+                    isActive ? "scale-105" : "group-hover/tab:scale-105"
+                  }`}
+                  style={{ color: isActive ? "#C17B5C" : "#B5ADA7" }}
+                >
+                  {tab.icon}
+                </div>
               </div>
 
               {/* Label */}
@@ -126,30 +171,14 @@ export default function MobileTabBar() {
                 className="font-body transition-all duration-300"
                 style={{
                   fontSize: "10px",
-                  marginTop: isCenter ? "2px" : "3px",
+                  marginTop: "4px",
                   fontWeight: isActive ? 600 : 400,
                   color: isActive ? "#C17B5C" : "#B5ADA7",
                   letterSpacing: "0.02em",
-                  transform: isActive && !isCenter ? "scale(1.05)" : "scale(1)",
                 }}
               >
                 {tab.label}
               </span>
-
-              {/* Active indicator dot (non-center tabs only) */}
-              {!isCenter && (
-                <div
-                  className="transition-all duration-400"
-                  style={{
-                    width: isActive ? 4 : 0,
-                    height: isActive ? 4 : 0,
-                    borderRadius: "50%",
-                    background: "#C17B5C",
-                    marginTop: 2,
-                    opacity: isActive ? 1 : 0,
-                  }}
-                />
-              )}
             </button>
           );
         })}
