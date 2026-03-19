@@ -83,9 +83,10 @@ export default function Routine() {
     <SubPageLayout
       title="护肤方案"
       subtitle={`${plan.skinType} · ${plan.concerns.join(" · ")}`}
+      accentColor="#5A8A5A"
     >
       {/* Stats + Week dots */}
-      <div className="card-warm p-3.5 mb-4">
+      <div className="card-warm p-4 mb-4 hover-lift">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
             <span className="text-[16px]">🔥</span>
@@ -98,8 +99,8 @@ export default function Routine() {
           {weekDots.map((dot, i) => (
             <div key={i} className="flex flex-col items-center gap-0.5">
               <div
-                className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
-                  dot.done ? "bg-[#C17B5C] text-white" : "bg-[rgba(237,232,224,0.6)] text-[#B5ADA7]"
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] transition-all duration-300 ${
+                  dot.done ? "bg-[#C17B5C] text-white scale-110 shadow-sm" : "bg-[rgba(237,232,224,0.6)] text-[#B5ADA7]"
                 }`}
               >
                 {dot.done ? "✓" : ""}
@@ -114,20 +115,20 @@ export default function Routine() {
       <div className="flex gap-2 mb-3">
         <button
           onClick={() => setTab("am")}
-          className={`flex-1 py-2 rounded-xl font-body text-[12px] font-medium transition-all ${
+          className={`flex-1 py-2.5 rounded-xl font-body text-[13px] font-medium transition-all duration-300 ${
             tab === "am"
-              ? "bg-[rgba(193,123,92,0.1)] text-[#C17B5C] border border-[rgba(193,123,92,0.2)]"
-              : "bg-[rgba(237,232,224,0.4)] text-[#9A8C82] border border-transparent"
+              ? "bg-[rgba(193,123,92,0.12)] text-[#C17B5C] border border-[rgba(193,123,92,0.25)] shadow-sm"
+              : "bg-[rgba(237,232,224,0.4)] text-[#9A8C82] border border-transparent hover:bg-[rgba(237,232,224,0.7)]"
           }`}
         >
           ☀️ 早间 {plan.amSteps.length}步
         </button>
         <button
           onClick={() => setTab("pm")}
-          className={`flex-1 py-2 rounded-xl font-body text-[12px] font-medium transition-all ${
+          className={`flex-1 py-2.5 rounded-xl font-body text-[13px] font-medium transition-all duration-300 ${
             tab === "pm"
-              ? "bg-[rgba(193,123,92,0.1)] text-[#C17B5C] border border-[rgba(193,123,92,0.2)]"
-              : "bg-[rgba(237,232,224,0.4)] text-[#9A8C82] border border-transparent"
+              ? "bg-[rgba(193,123,92,0.12)] text-[#C17B5C] border border-[rgba(193,123,92,0.25)] shadow-sm"
+              : "bg-[rgba(237,232,224,0.4)] text-[#9A8C82] border border-transparent hover:bg-[rgba(237,232,224,0.7)]"
           }`}
         >
           🌙 晚间 {plan.pmSteps.length}步
@@ -136,9 +137,9 @@ export default function Routine() {
 
       {/* Progress */}
       <div className="flex items-center gap-2.5 mb-3">
-        <div className="flex-1 h-1.5 bg-[rgba(237,232,224,0.6)] rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-[rgba(237,232,224,0.6)] rounded-full overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-500"
+            className="h-full rounded-full transition-all duration-700 ease-out progress-animated"
             style={{
               width: `${progress}%`,
               background: allDone
@@ -151,7 +152,7 @@ export default function Routine() {
       </div>
 
       {/* Steps */}
-      <div className="space-y-2">
+      <div className="space-y-2 stagger-children">
         {steps.map((step) => {
           const isDone = completed.includes(step.id);
           const isOptional = step.frequency !== "daily";
@@ -159,12 +160,12 @@ export default function Routine() {
             <div
               key={step.id}
               onClick={() => toggleStep(step.id)}
-              className={`card-warm px-3.5 py-3 cursor-pointer transition-all active:scale-[0.98] ${isDone ? "opacity-50" : ""}`}
+              className={`card-warm px-3.5 py-3 cursor-pointer transition-all duration-300 active:scale-[0.98] hover-lift ${isDone ? "opacity-60" : ""}`}
             >
               <div className="flex items-start gap-2.5">
                 <div
-                  className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-                    isDone ? "bg-[#C17B5C] border-[#C17B5C]" : "border-[rgba(193,123,92,0.25)]"
+                  className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-300 ${
+                    isDone ? "bg-[#C17B5C] border-[#C17B5C] scale-110" : "border-[rgba(193,123,92,0.25)]"
                   }`}
                   style={{ width: 18, height: 18 }}
                 >
@@ -196,8 +197,8 @@ export default function Routine() {
       </div>
 
       {allDone && (
-        <div className="mt-3 text-center py-3 rounded-xl bg-[rgba(74,154,107,0.05)]">
-          <span className="text-[20px]">🎉</span>
+        <div className="mt-3 text-center py-4 rounded-xl bg-[rgba(74,154,107,0.05)] anim-bounce-in">
+          <span className="text-[24px] inline-block anim-float" style={{ animationDuration: '2s' }}>🎉</span>
           <p className="font-body text-[13px] text-[#4A9A6B] font-medium mt-0.5">
             {tab === "am" ? "早间" : "晚间"}护肤已完成！
           </p>

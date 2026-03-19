@@ -112,7 +112,7 @@ export default function Diary() {
   );
 
   return (
-    <SubPageLayout title="皮肤日记" subtitle="记录每日皮肤状态，追踪变化趋势">
+    <SubPageLayout title="皮肤日记" subtitle="记录每日皮肤状态，追踪变化趋势" accentColor="#C17B5C">
       {/* ===== Form ===== */}
       <div className="space-y-4">
         {/* Mood */}
@@ -123,10 +123,10 @@ export default function Diary() {
               <button
                 key={m}
                 onClick={() => { setMood(m); setSaved(false); }}
-                className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all ${
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl transition-all duration-300 ${
                   mood === m
-                    ? "bg-[rgba(193,123,92,0.1)] border border-[rgba(193,123,92,0.25)]"
-                    : "bg-[rgba(237,232,224,0.4)] border border-transparent"
+                    ? "bg-[rgba(193,123,92,0.1)] border border-[rgba(193,123,92,0.25)] scale-105 shadow-sm"
+                    : "bg-[rgba(237,232,224,0.4)] border border-transparent hover:bg-[rgba(237,232,224,0.7)] hover:scale-[1.02]"
                 }`}
               >
                 <span className="text-[20px]">{MOOD_EMOJIS[m]}</span>
@@ -146,10 +146,10 @@ export default function Diary() {
               <button
                 key={issue}
                 onClick={() => toggleIssue(issue)}
-                className={`px-2.5 py-1 rounded-full text-[12px] font-body transition-all ${
+                className={`px-3 py-1.5 rounded-full text-[12px] font-body transition-all duration-300 ${
                   issues.includes(issue)
-                    ? "bg-[#C17B5C] text-white"
-                    : "bg-[rgba(237,232,224,0.5)] text-[#7A6E68]"
+                    ? "bg-[#C17B5C] text-white shadow-sm scale-105"
+                    : "bg-[rgba(237,232,224,0.5)] text-[#7A6E68] hover:bg-[rgba(237,232,224,0.8)] hover:scale-[1.02]"
                 }`}
               >
                 {issue}
@@ -198,19 +198,20 @@ export default function Diary() {
       <div className="card-warm p-4 mb-4">
         <p className="font-body text-[12px] text-[#7A6E68] font-medium mb-2.5">7日情绪趋势</p>
         {recent7.length > 0 ? (
-          <div className="flex items-end gap-1 h-20">
-            {recent7.map((e) => {
+          <div className="flex items-end gap-1.5 h-24 stagger-children">
+            {recent7.map((e, idx) => {
               const h = (e.mood / 5) * 100;
               const dayLabel = e.date.slice(5).replace("-", "/");
               return (
-                <div key={e.id} className="flex-1 flex flex-col items-center gap-0.5">
-                  <span className="text-[12px]">{MOOD_EMOJIS[e.mood]}</span>
-                  <div className="w-full flex items-end justify-center" style={{ height: 40 }}>
+                <div key={e.id} className="flex-1 flex flex-col items-center gap-1 group/bar">
+                  <span className="text-[14px] group-hover/bar:scale-125 transition-transform duration-300">{MOOD_EMOJIS[e.mood]}</span>
+                  <div className="w-full flex items-end justify-center" style={{ height: 48 }}>
                     <div
-                      className="w-3/4 rounded-t-sm"
+                      className="w-3/4 rounded-t-md transition-all duration-500 group-hover/bar:w-full"
                       style={{
                         height: `${h}%`,
-                        background: `rgba(193,123,92,${0.2 + (e.mood / 5) * 0.5})`,
+                        background: `linear-gradient(180deg, rgba(193,123,92,${0.3 + (e.mood / 5) * 0.5}), rgba(193,123,92,${0.1 + (e.mood / 5) * 0.3}))`,
+                        animationDelay: `${idx * 0.08}s`,
                       }}
                     />
                   </div>
@@ -231,7 +232,7 @@ export default function Diary() {
           {insights.map((insight, i) => (
             <div
               key={i}
-              className="rounded-xl px-3.5 py-2.5"
+              className="rounded-xl px-3.5 py-3 hover-lift"
               style={{ background: insightTypeBg(insight.type), border: `1px solid ${insightTypeColor(insight.type)}15` }}
             >
               <div className="flex items-center gap-1.5 mb-0.5">
@@ -251,7 +252,7 @@ export default function Diary() {
         <p className="font-body text-[12px] text-[#7A6E68] font-medium mb-2">历史日记</p>
         <div className="space-y-1.5">
           {[...entries].reverse().slice(0, 10).map((e) => (
-            <div key={e.id} className="card-warm px-3.5 py-2.5 flex items-center gap-2.5">
+            <div key={e.id} className="card-warm px-3.5 py-2.5 flex items-center gap-2.5 hover-lift">
               <span className="text-[18px]">{MOOD_EMOJIS[e.mood]}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">

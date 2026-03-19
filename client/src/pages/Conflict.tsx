@@ -73,7 +73,7 @@ export default function Conflict() {
   };
 
   return (
-    <SubPageLayout title="冲突检测" subtitle="检测产品之间的成分冲突与协同">
+    <SubPageLayout title="冲突检测" subtitle="检测产品之间的成分冲突与协同" accentColor="#B08050">
       {/* Product Selection */}
       <div className="space-y-3">
         <p className="font-body text-[12px] text-[#7A6E68] font-medium">选择要检测的产品</p>
@@ -82,16 +82,16 @@ export default function Conflict() {
             <button
               key={p.id}
               onClick={() => toggleProduct(p.id)}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all active:scale-[0.98] ${
+              className={`w-full text-left px-3.5 py-3 rounded-xl transition-all duration-300 active:scale-[0.98] hover-lift ${
                 p.selected
-                  ? "bg-[rgba(193,123,92,0.06)] border border-[rgba(193,123,92,0.2)]"
+                  ? "bg-[rgba(193,123,92,0.06)] border border-[rgba(193,123,92,0.2)] shadow-sm"
                   : "bg-[rgba(237,232,224,0.3)] border border-transparent"
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <div
-                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                    p.selected ? "bg-[#C17B5C] border-[#C17B5C]" : "border-[rgba(193,123,92,0.2)]"
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
+                    p.selected ? "bg-[#C17B5C] border-[#C17B5C] scale-110" : "border-[rgba(193,123,92,0.2)]"
                   }`}
                 >
                   {p.selected && (
@@ -133,10 +133,10 @@ export default function Conflict() {
       {checked && (
         <>
           <div className="warm-divider my-5" />
-          <div className="space-y-4 anim-fade-up">
+          <div className="space-y-4 anim-slide-up">
             {/* Summary */}
-            <div className="card-warm p-3.5 flex items-center gap-2.5">
-              <span className="text-[24px]">{conflicts.length === 0 ? "✅" : "⚠️"}</span>
+            <div className="card-warm p-4 flex items-center gap-3 hover-lift">
+              <span className="text-[28px] anim-bounce-in">{conflicts.length === 0 ? "✅" : "⚠️"}</span>
               <div>
                 <p className="font-body text-[13px] text-[#2D2420] font-medium">
                   {conflicts.length === 0 ? "未发现冲突" : `发现 ${conflicts.length} 个潜在冲突`}
@@ -155,7 +155,7 @@ export default function Conflict() {
                   {conflicts.map((c, i) => (
                     <div
                       key={i}
-                      className="card-warm px-3.5 py-2.5"
+                      className="card-warm px-3.5 py-3 hover-lift"
                       style={{ borderLeft: `3px solid ${severityColor(c.rule.severity)}` }}
                     >
                       <span
@@ -180,7 +180,7 @@ export default function Conflict() {
                 <p className="font-body text-[12px] text-[#7A6E68] font-medium mb-2">协同增效</p>
                 <div className="space-y-1.5">
                   {synergies.map((s, i) => (
-                    <div key={i} className="card-warm px-3.5 py-2.5" style={{ borderLeft: "3px solid #4A9A6B" }}>
+                    <div key={i} className="card-warm px-3.5 py-3 hover-lift" style={{ borderLeft: "3px solid #4A9A6B" }}>
                       <p className="font-body text-[12px] text-[#4A9A6B] font-medium">{s.rule.benefit}</p>
                       <p className="font-body text-[11px] text-[#2D2420]">{s.ingredientA} + {s.ingredientB}</p>
                       <p className="font-body text-[11px] text-[#7A6E68] mt-0.5">{s.rule.description}</p>
@@ -192,7 +192,7 @@ export default function Conflict() {
 
             {/* Order */}
             {(order.am.length > 0 || order.pm.length > 0) && (
-              <div className="card-warm p-3.5">
+              <div className="card-warm p-4 hover-lift">
                 <p className="font-body text-[12px] text-[#7A6E68] font-medium mb-2">建议使用顺序</p>
                 {order.am.length > 0 && (
                   <div className="mb-2">
@@ -222,9 +222,9 @@ export default function Conflict() {
 
       {/* Empty state */}
       {!checked && (
-        <div className="text-center py-12">
-          <span className="text-[32px]">🔍</span>
-          <p className="font-body text-[13px] text-[#B5ADA7] mt-2">选择产品后查看冲突检测结果</p>
+        <div className="text-center py-16">
+          <span className="text-[40px] inline-block anim-float" style={{ animationDuration: '3s' }}>🔍</span>
+          <p className="font-body text-[13px] text-[#B5ADA7] mt-3">选择产品后查看冲突检测结果</p>
         </div>
       )}
     </SubPageLayout>

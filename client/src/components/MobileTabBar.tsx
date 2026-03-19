@@ -1,6 +1,7 @@
 /*
  * MobileTabBar — 移动端底部导航
- * Design: Warm Ivory Minimalism — 平齐5tab，检测用填充色区分
+ * Design: Warm Ivory Minimalism + Lively Motion
+ * 特色：选中态动画指示器、平滑过渡、检测按钮渐变
  */
 import { useLocation } from "wouter";
 
@@ -32,7 +33,7 @@ const tabs = [
     path: "/chat",
     isCenter: true,
     icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
         <circle cx="12" cy="13" r="4" />
       </svg>
@@ -76,15 +77,16 @@ export default function MobileTabBar() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
       style={{
-        height: `calc(56px + env(safe-area-inset-bottom, 0px))`,
+        height: `calc(60px + env(safe-area-inset-bottom, 0px))`,
         paddingBottom: `env(safe-area-inset-bottom, 0px)`,
-        background: "rgba(242, 237, 230, 0.92)",
-        backdropFilter: "blur(16px) saturate(1.5)",
-        WebkitBackdropFilter: "blur(16px) saturate(1.5)",
-        borderTop: "1px solid rgba(45, 36, 32, 0.06)",
+        background: "rgba(253, 250, 247, 0.88)",
+        backdropFilter: "blur(20px) saturate(1.6)",
+        WebkitBackdropFilter: "blur(20px) saturate(1.6)",
+        borderTop: "1px solid rgba(45, 36, 32, 0.05)",
+        boxShadow: "0 -4px 24px rgba(45, 36, 32, 0.04)",
       }}
     >
-      <div className="flex items-center h-[56px]">
+      <div className="flex items-center h-[60px]">
         {tabs.map((tab) => {
           const isActive = getIsActive(location, tab.path);
           const isCenter = tab.isCenter;
@@ -93,15 +95,16 @@ export default function MobileTabBar() {
             <button
               key={tab.path}
               onClick={() => setLocation(tab.path)}
-              className="flex flex-col items-center justify-center flex-1 h-full transition-all duration-200"
+              className="flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 group/tab"
             >
+              {/* Icon container */}
               <div
-                className={`flex items-center justify-center transition-all duration-200 ${
-                  isCenter && isActive
-                    ? "w-10 h-10 rounded-xl"
-                    : isCenter
-                    ? "w-10 h-10 rounded-xl"
-                    : ""
+                className={`flex items-center justify-center transition-all duration-400 ${
+                  isCenter
+                    ? "w-11 h-11 rounded-2xl"
+                    : isActive
+                    ? "scale-110"
+                    : "group-hover/tab:scale-105"
                 }`}
                 style={
                   isCenter
@@ -110,24 +113,43 @@ export default function MobileTabBar() {
                           ? "linear-gradient(145deg, #C17B5C, #D4956F)"
                           : "rgba(193,123,92,0.08)",
                         color: isActive ? "white" : "#C17B5C",
+                        boxShadow: isActive ? "0 4px 16px rgba(193,123,92,0.3)" : "none",
                       }
                     : { color: isActive ? "#C17B5C" : "#B5ADA7" }
                 }
               >
                 {tab.icon}
               </div>
+
+              {/* Label */}
               <span
-                className="font-body"
+                className="font-body transition-all duration-300"
                 style={{
                   fontSize: "10px",
                   marginTop: isCenter ? "2px" : "3px",
                   fontWeight: isActive ? 600 : 400,
                   color: isActive ? "#C17B5C" : "#B5ADA7",
                   letterSpacing: "0.02em",
+                  transform: isActive && !isCenter ? "scale(1.05)" : "scale(1)",
                 }}
               >
                 {tab.label}
               </span>
+
+              {/* Active indicator dot (non-center tabs only) */}
+              {!isCenter && (
+                <div
+                  className="transition-all duration-400"
+                  style={{
+                    width: isActive ? 4 : 0,
+                    height: isActive ? 4 : 0,
+                    borderRadius: "50%",
+                    background: "#C17B5C",
+                    marginTop: 2,
+                    opacity: isActive ? 1 : 0,
+                  }}
+                />
+              )}
             </button>
           );
         })}

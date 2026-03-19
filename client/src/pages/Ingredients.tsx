@@ -87,7 +87,7 @@ export default function Ingredients() {
   const unmatched = result?.ingredients.filter((i) => !i.info) || [];
 
   return (
-    <SubPageLayout title="成分分析器" subtitle="粘贴成分表，AI 为你解读每一个成分">
+    <SubPageLayout title="成分分析器" subtitle="粘贴成分表，AI 为你解读每一个成分" accentColor="#6A7AB0">
       {/* Input */}
       <div className="space-y-3">
         <textarea
@@ -117,7 +117,7 @@ export default function Ingredients() {
               <button
                 key={p.name}
                 onClick={() => handlePreset(p)}
-                className="shrink-0 px-2.5 py-1.5 rounded-lg font-body text-[11px] text-[#7A6E68] bg-[rgba(237,232,224,0.5)] border border-[rgba(45,36,32,0.04)] hover:text-[#C17B5C] active:scale-[0.96] transition-all"
+                className="shrink-0 px-3 py-1.5 rounded-lg font-body text-[11px] text-[#7A6E68] bg-[rgba(237,232,224,0.5)] border border-[rgba(45,36,32,0.04)] hover:text-[#C17B5C] hover:border-[rgba(193,123,92,0.2)] hover:shadow-sm active:scale-[0.96] transition-all duration-300"
               >
                 {p.brand} {p.name}
               </button>
@@ -130,9 +130,9 @@ export default function Ingredients() {
       {result && (
         <>
           <div className="warm-divider my-5" />
-          <div ref={resultRef} className="space-y-3 anim-fade-up">
+          <div ref={resultRef} className="space-y-3 anim-slide-up">
             {/* Overview */}
-            <div className="card-warm p-3.5">
+            <div className="card-warm p-4 hover-lift">
               <h3 className="font-display text-[1rem] text-[#2D2420] mb-2.5">{result.productName}</h3>
               <div className="grid grid-cols-2 gap-2.5">
                 <div className="rounded-lg p-2.5 bg-[rgba(237,232,224,0.4)]">
@@ -176,7 +176,7 @@ export default function Ingredients() {
               <p className="font-body text-[12px] text-[#7A6E68] font-medium mb-2">成分详解</p>
               <div className="space-y-1.5">
                 {matched.map(({ raw, info }) => (
-                  <div key={raw} className="card-warm px-3 py-2.5">
+                  <div key={raw} className="card-warm px-3 py-2.5 hover-lift">
                     <div className="flex items-start gap-2">
                       <span className="text-[12px] mt-0.5">{safetyEmoji(info!.safety)}</span>
                       <div className="flex-1 min-w-0">
@@ -220,9 +220,9 @@ export default function Ingredients() {
 
       {/* Empty state */}
       {!result && (
-        <div className="text-center py-12">
-          <span className="text-[32px]">🧪</span>
-          <p className="font-body text-[13px] text-[#B5ADA7] mt-2">输入成分表后查看分析结果</p>
+        <div className="text-center py-16">
+          <span className="text-[40px] inline-block anim-float" style={{ animationDuration: '3s' }}>🧪</span>
+          <p className="font-body text-[13px] text-[#B5ADA7] mt-3">输入成分表后查看分析结果</p>
         </div>
       )}
     </SubPageLayout>
