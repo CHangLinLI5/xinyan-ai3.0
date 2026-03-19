@@ -1,0 +1,13 @@
+All pages verified:
+
+1. Home (/) - Desktop: Two-column layout working. Today overview, routine progress, insight banner, diary card, quick actions, detection entry, hero image. Mobile: Same content in single column.
+2. Diary (/diary) - Desktop: Left form (mood, issues, habits, note), right panel (7-day trend, AI insights, history list). 13 mock diary entries showing.
+3. Routine (/routine) - AM/PM tabs, 5 AM steps + 7 PM steps, streak display (12 days), 95% completion rate, weekly checkin dots.
+4. Ingredients (/ingredients) - Textarea input, 6 preset products, empty state shown. Desktop: left input, right results panel.
+5. Conflict (/conflict) - Product selector with 6 products, 3 pre-selected, conflict detection button. Desktop: left selector, right results.
+6. Discover (/discover) - Ingredient spotlight (神经酰胺), 6 articles, 6 daily tips, quick tool links.
+7. Chat (/chat) - Agent shortcuts (记录日记, 成分分析, 冲突检测, 护肤方案) added below upload area. Quick questions still present.
+8. Profile (/profile) - New "护肤伴侣数据" section showing: 13天日记, 12天连续打卡, 95%完成率, 3个产品库. Version updated to v3.0.
+
+No TypeScript errors. No build errors. All pages render correctly.
+MobileTabBar: 5 tabs (首页, 日记, 发现, 检测, 我的) - working on mobile view.

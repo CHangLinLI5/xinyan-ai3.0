@@ -43,6 +43,13 @@ const quickQuestions = [
   "敏感肌日常护理建议",
 ];
 
+const agentShortcuts = [
+  { label: "记录日记", path: "/diary", icon: "📝" },
+  { label: "成分分析", path: "/ingredients", icon: "🧪" },
+  { label: "冲突检测", path: "/conflict", icon: "🔍" },
+  { label: "护肤方案", path: "/routine", icon: "📋" },
+];
+
 const resultFollowUps = [
   "如何改善毛孔评分？",
   "推荐适合我的精华液",
@@ -342,8 +349,23 @@ export default function Chat() {
               </div>
             </div>
 
+            {/* Agent shortcuts */}
+            <div className="flex gap-2 mt-6 max-w-sm justify-center anim-fade-up d-350">
+              {agentShortcuts.map((s) => (
+                <button
+                  key={s.path}
+                  onClick={() => setLocation(s.path)}
+                  className="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl transition-all active:scale-[0.96] hover:shadow-sm"
+                  style={{ background: "rgba(237,232,224,0.6)", border: "1px solid rgba(45,36,32,0.05)" }}
+                >
+                  <span className="text-[18px]">{s.icon}</span>
+                  <span className="font-body text-[12px] text-[#7A6E68]">{s.label}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Quick questions */}
-            <div className="flex flex-wrap gap-2 mt-6 max-w-sm justify-center anim-fade-up d-400">
+            <div className="flex flex-wrap gap-2 mt-4 max-w-sm justify-center anim-fade-up d-400">
               {quickQuestions.map((q) => (
                 <button
                   key={q}

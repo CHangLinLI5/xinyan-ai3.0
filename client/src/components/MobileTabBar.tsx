@@ -1,8 +1,9 @@
 /*
- * MobileTabBar — 移动端底部导航
+ * MobileTabBar — 移动端底部导航 (Agent 3.0)
  * Design: Warm Ivory Minimalism
- * Ch8.1: 选中 tab 下方加小圆点指示器
- * Ch8.2: 增强毛玻璃效果 blur(16px) + 更透明
+ * 5 tabs: 首页 / 日记 / 发现 / 检测 / 我的
+ * 选中 tab 下方加小圆点指示器
+ * 增强毛玻璃效果 blur(16px) + 更透明
  */
 import { useLocation } from "wouter";
 
@@ -18,34 +19,34 @@ const tabs = [
     ),
   },
   {
+    label: "日记",
+    path: "/diary",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+      </svg>
+    ),
+  },
+  {
+    label: "发现",
+    path: "/discover",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+      </svg>
+    ),
+  },
+  {
     label: "检测",
     path: "/chat",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
         <circle cx="12" cy="13" r="4" />
-      </svg>
-    ),
-  },
-  {
-    label: "日历",
-    path: "/calendar",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-      </svg>
-    ),
-  },
-  {
-    label: "记录",
-    path: "/history",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
   },
@@ -67,6 +68,8 @@ export default function MobileTabBar() {
   const getIsActive = (path: string) => {
     if (path === "/") return location === "/";
     if (path === "/chat") return location === "/chat" || location === "/result";
+    if (path === "/diary") return location === "/diary" || location === "/routine";
+    if (path === "/discover") return location === "/discover" || location === "/ingredients" || location === "/conflict";
     return location === path;
   };
 
@@ -106,13 +109,10 @@ export default function MobileTabBar() {
               >
                 {tab.label}
               </span>
-              {/* Ch8.1: Selected dot indicator */}
               {isActive && (
                 <div
                   className="absolute bottom-1.5 w-1 h-1 rounded-full bg-[#C17B5C]"
-                  style={{
-                    animation: "fadeIn 0.2s ease-out",
-                  }}
+                  style={{ animation: "fadeIn 0.2s ease-out" }}
                 />
               )}
             </button>

@@ -12,6 +12,7 @@ import Logo from "@/components/Logo";
 import MobileTabBar from "@/components/MobileTabBar";
 import { getProfile, saveProfile, getDaysSinceFirstVisit, clearAllData } from "@/lib/userStorage";
 import { ALL_RECORDS } from "@/lib/mockData";
+import { getDiaryEntries, getRoutineStats, getSavedProducts, clearAgentData } from "@/lib/agentStorage";
 import { toast } from "sonner";
 
 export default function Profile() {
@@ -31,6 +32,13 @@ export default function Profile() {
     return { total, maxScore, avgScore };
   }, []);
 
+  const agentStats = useMemo(() => {
+    const diaryCount = getDiaryEntries().length;
+    const routineStats = getRoutineStats();
+    const savedCount = getSavedProducts().length;
+    return { diaryCount, streak: routineStats.streak, weekRate: routineStats.weekRate, savedCount };
+  }, []);
+
   const handleSaveNickname = useCallback(() => {
     const newProfile = { ...profile, nickname: nicknameInput.trim() || "芯颜用户" };
     setProfile(newProfile);
@@ -48,6 +56,7 @@ export default function Profile() {
 
   const handleClearData = useCallback(() => {
     clearAllData();
+    clearAgentData();
     setProfile(getProfile());
     setShowClearConfirm(false);
     toast.success("所有数据已清除");
@@ -122,7 +131,7 @@ export default function Profile() {
           </div>
 
           {/* Stats Cards */}
-          <div className="card-warm p-5 mb-6 anim-fade-up d-100">
+          <div className="card-warm p-5 mb-4 anim-fade-up d-100">
             <div className="grid grid-cols-3 gap-4">
               {[
                 { label: "总检测", value: stats.total, suffix: "次" },
@@ -135,6 +144,27 @@ export default function Profile() {
                     {stat.suffix && <span className="text-sm text-[#B5ADA7] ml-0.5">{stat.suffix}</span>}
                   </p>
                   <p className="label-sm mt-1">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Agent Stats */}
+          <div className="card-warm p-5 mb-6 anim-fade-up d-150">
+            <p className="font-body text-[12px] text-[#B5ADA7] tracking-wider mb-3 uppercase">护肤伴侣数据</p>
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { label: "日记", value: agentStats.diaryCount, suffix: "天", icon: "📝" },
+                { label: "连续打卡", value: agentStats.streak, suffix: "天", icon: "🔥" },
+                { label: "完成率", value: agentStats.weekRate, suffix: "%", icon: "✅" },
+                { label: "产品库", value: agentStats.savedCount, suffix: "个", icon: "🧴" },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <span className="text-[16px]">{stat.icon}</span>
+                  <p className="font-display text-lg font-light text-[#2D2420] mt-0.5">
+                    {stat.value}<span className="text-[12px] text-[#B5ADA7]">{stat.suffix}</span>
+                  </p>
+                  <p className="label-sm mt-0.5">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -218,7 +248,7 @@ export default function Profile() {
                 </svg>
                 <span className="font-body text-sm text-[#2D2420]">关于芯颜 AI</span>
               </div>
-              <span className="font-body text-xs text-[#B5ADA7]">v1.0</span>
+  <span className="font-body text-xs text-[#B5ADA7]">v3.0</span>
             </div>
           </div>
 

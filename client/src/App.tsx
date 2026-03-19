@@ -11,6 +11,11 @@ import Calendar from "./pages/Calendar";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
+import Diary from "./pages/Diary";
+import Routine from "./pages/Routine";
+import Ingredients from "./pages/Ingredients";
+import Conflict from "./pages/Conflict";
+import Discover from "./pages/Discover";
 
 function Router() {
   return (
@@ -22,6 +27,11 @@ function Router() {
       <Route path="/history" component={History} />
       <Route path="/profile" component={Profile} />
       <Route path="/login" component={Login} />
+      <Route path="/diary" component={Diary} />
+      <Route path="/routine" component={Routine} />
+      <Route path="/ingredients" component={Ingredients} />
+      <Route path="/conflict" component={Conflict} />
+      <Route path="/discover" component={Discover} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

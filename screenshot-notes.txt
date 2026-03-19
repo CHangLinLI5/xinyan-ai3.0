@@ -1,0 +1,15 @@
+Desktop Home screenshot observations:
+1. Layout: Left-right two-column working correctly
+2. Left column: Today overview card (date, greeting, routine progress 0%, AM 0/5, PM 0/6, 12-day streak)
+3. Left column: Insight banner "连续3天出现出油" - working
+4. Left column: Diary card "记录今日皮肤状态" - working
+5. Left column: Tip card - working
+6. Right column: Quick actions grid (皮肤日记, 护肤方案, 成分分析, 冲突检测) - working
+7. Right column: AI detection CTA button - working
+8. Right column: Chat entry button - working
+9. Right column: Hero image card - working
+10. Top nav: 日记, 方案, 发现, 检测, 个人中心 - working
+11. Footer: 护肤知识 link, 服务运行中 - working
+12. No TypeScript errors
+13. Quick action icons look like emoji rendering, could be improved but functional
+14. Overall looks clean and well-structured
