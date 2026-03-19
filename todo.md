@@ -1,31 +1,15 @@
-# 芯颜AI Agent功能升级 TODO
+# 芯颜AI - 以皮肤检测为核心重构
 
-## Step 1: 数据层
-- [x] agentStorage.ts - 统一存储模块
-- [x] mockAgentData.ts - 14天日记+默认方案+12天打卡+3个已保存产品
-- [x] ingredientDatabase.ts - 80+成分条目
-- [x] conflictRules.ts - 15+冲突规则+8+安全搭配
-- [x] diaryInsights.ts - 6条AI洞察规则
+## MobileTabBar 重构
+- [ ] 检测tab放中间C位，使用凸起的圆形按钮样式
+- [ ] 5个tab: 首页 / 日记 / 检测(C位) / 发现 / 我的
 
-## Step 2: 新页面
-- [ ] Diary.tsx - 皮肤日记页
-- [ ] Routine.tsx - 护肤方案+打卡页
-- [ ] Ingredients.tsx - 成分分析器页
-- [ ] Conflict.tsx - 产品冲突检测页
-- [ ] Discover.tsx - 发现/工具集合页
+## Home 首页重构
+- [ ] 移动端：检测CTA放在最顶部（问候语下方），作为最醒目的入口
+- [ ] 移动端：快捷功能降低权重，放在下方
+- [ ] 桌面端：左栏大面积检测入口 + 右栏辅助功能
+- [ ] 检测入口视觉更大、更突出
 
-## Step 3: 导航更新
-- [ ] App.tsx - 添加新路由
-- [ ] MobileTabBar.tsx - 重构5个tab (首页/AI对话/方案/发现/我的)
-- [ ] Home.tsx - 重构为今日仪表盘
-
-## Step 4: 集成更新
-- [ ] Chat.tsx - 添加功能快捷入口+更新快捷问题
-- [ ] Profile.tsx - 添加新统计数据+新设置项
-
-## Step 5: 打磨
-- [ ] 所有页面入场动画
-- [ ] 空状态设计
-- [ ] toast反馈
-- [ ] 桌面端双栏适配
-- [ ] 全面测试
+## 验证
+- [ ] 测试移动端和桌面端布局
+- [ ] 确保所有页面导航正常

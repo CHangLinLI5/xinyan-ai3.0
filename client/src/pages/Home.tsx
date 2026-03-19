@@ -1,13 +1,12 @@
 /*
- * Home.tsx — 今日仪表盘 (Agent 3.0)
+ * Home.tsx — 以皮肤检测为核心的首页
  * Design: Warm Ivory Minimalism
  * 
- * 移动端：今日概览 → 护肤打卡进度 → 快捷功能 → 日记摘要 → AI检测入口
- * 桌面端：左栏(今日概览+打卡) + 右栏(快捷功能+日记+检测)
+ * 移动端：大面积检测入口 → 今日概览 → 辅助功能
+ * 桌面端：左栏(大面积检测入口+英雄区) + 右栏(今日概览+辅助功能)
  */
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { toast } from "sonner";
 import Logo from "@/components/Logo";
 import MobileTabBar from "@/components/MobileTabBar";
 import {
@@ -21,13 +20,6 @@ import { MOOD_EMOJIS, MOOD_LABELS, type DiaryEntry } from "@/lib/mockAgentData";
 import { generateInsights } from "@/lib/diaryInsights";
 
 const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663449767573/9NFV4vPhGYnrkNfpEcCSrd/hero-face-KvC8ByCEeL23Hap2YwZiKi.webp";
-
-const quickActions = [
-  { label: "皮肤日记", path: "/diary", icon: "📝", desc: "记录今日状态" },
-  { label: "护肤方案", path: "/routine", icon: "📋", desc: "查看今日步骤" },
-  { label: "成分分析", path: "/ingredients", icon: "🧪", desc: "解读成分表" },
-  { label: "冲突检测", path: "/conflict", icon: "🔍", desc: "产品搭配安全" },
-];
 
 const skinTips = [
   "每天涂抹防晒霜是抗衰老最有效的方式之一",
@@ -117,17 +109,84 @@ export default function Home() {
     { label: "日记", path: "/diary" },
     { label: "方案", path: "/routine" },
     { label: "发现", path: "/discover" },
-    { label: "检测", path: "/chat" },
     { label: "个人中心", path: "/profile" },
   ];
 
-  // ===== Shared Components =====
+  // ===== Hero Detection CTA =====
+  const HeroDetection = ({ isMobile = false }: { isMobile?: boolean }) => (
+    <div
+      className={`relative overflow-hidden ${isMobile ? "rounded-2xl mx-5" : "rounded-2xl"}`}
+      style={{
+        background: "linear-gradient(145deg, #C17B5C 0%, #D4956F 40%, #E0A882 100%)",
+        boxShadow: "0 8px 32px rgba(193,123,92,0.3), 0 2px 8px rgba(193,123,92,0.15)",
+      }}
+    >
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full" style={{ background: "rgba(255,255,255,0.08)" }} />
+        <div className="absolute -bottom-4 -left-4 w-24 h-24 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }} />
+        <div className="absolute top-1/2 right-1/4 w-16 h-16 rounded-full" style={{ background: "rgba(255,255,255,0.04)" }} />
+      </div>
+
+      <button
+        onClick={() => setLocation("/chat")}
+        className={`relative w-full text-left transition-all active:scale-[0.98] ${isMobile ? "px-6 py-7" : "px-8 py-10"}`}
+      >
+        {/* Camera icon */}
+        <div
+          className={`${isMobile ? "w-14 h-14" : "w-16 h-16"} rounded-2xl flex items-center justify-center mb-4`}
+          style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}
+        >
+          <svg width={isMobile ? "26" : "30"} height={isMobile ? "26" : "30"} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" />
+          </svg>
+        </div>
+
+        <h2 className={`font-display text-white ${isMobile ? "text-[1.4rem]" : "text-[1.7rem]"} leading-tight`}>
+          AI 皮肤检测
+        </h2>
+        <p className={`font-body text-white/75 mt-1.5 ${isMobile ? "text-[13px]" : "text-[14px]"} leading-relaxed max-w-[280px]`}>
+          上传一张面部照片，AI 为你生成专业皮肤分析报告
+        </p>
+
+        <div className={`flex items-center gap-4 ${isMobile ? "mt-5" : "mt-6"}`}>
+          <div
+            className="flex items-center gap-2 px-4 py-2 rounded-xl"
+            style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(4px)" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            <span className="font-body text-[12px] text-white font-medium">拍照检测</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span className="font-body text-[12px] text-white/60">30秒出报告</span>
+          </div>
+        </div>
+
+        {/* Arrow indicator */}
+        <div className="absolute right-5 top-1/2 -translate-y-1/2 opacity-40">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+      </button>
+    </div>
+  );
+
+  // ===== Today Overview (compact) =====
   const TodayOverview = () => (
     <div className="card-warm p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="font-body text-[12px] text-[#B5ADA7]">{formatDate()}</p>
-          <h2 className="font-display text-[1.2rem] text-[#2D2420] mt-0.5">
+          <h2 className="font-display text-[1.1rem] text-[#2D2420] mt-0.5">
             {getGreeting()}，<span className="text-clay-gradient">芯颜</span>用户
           </h2>
         </div>
@@ -171,62 +230,80 @@ export default function Home() {
     </div>
   );
 
-  const QuickActions = () => (
-    <div className="grid grid-cols-2 gap-2.5">
-      {quickActions.map((action) => (
+  // ===== Quick Tools (secondary) =====
+  const QuickTools = () => (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
         <button
-          key={action.path}
-          onClick={() => setLocation(action.path)}
-          className="card-warm px-4 py-3.5 text-left transition-all active:scale-[0.96] hover:shadow-md"
+          onClick={() => setLocation("/diary")}
+          className="card-warm px-3.5 py-3 text-left transition-all active:scale-[0.97] hover:shadow-md flex items-center gap-3"
         >
-          <span className="text-[22px]">{action.icon}</span>
-          <p className="font-body text-[13px] text-[#2D2420] font-medium mt-2">{action.label}</p>
-          <p className="font-body text-[12px] text-[#9A8C82] mt-0.5">{action.desc}</p>
+          <div className="w-9 h-9 rounded-xl bg-[rgba(193,123,92,0.06)] flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </div>
+          <div className="min-w-0">
+            <p className="font-body text-[13px] text-[#2D2420] font-medium">皮肤日记</p>
+            <p className="font-body text-[11px] text-[#B5ADA7]">记录今日状态</p>
+          </div>
         </button>
-      ))}
-    </div>
-  );
 
-  const DiaryCard = () => (
-    <button
-      onClick={() => setLocation("/diary")}
-      className="card-warm w-full text-left px-4 py-3.5 transition-all active:scale-[0.98] hover:shadow-md"
-    >
-      {todayDiary ? (
-        <div className="flex items-start gap-3">
-          <span className="text-[24px]">{MOOD_EMOJIS[todayDiary.mood]}</span>
-          <div className="flex-1 min-w-0">
-            <p className="font-body text-[13px] text-[#2D2420] font-medium">今日日记已记录</p>
-            {todayDiary.issues.length > 0 && (
-              <div className="flex gap-1 mt-1 flex-wrap">
-                {todayDiary.issues.map((issue) => (
-                  <span key={issue} className="pill-clay text-[12px] py-0.5 px-2">{issue}</span>
-                ))}
-              </div>
-            )}
-            {todayDiary.note && (
-              <p className="font-body text-[12px] text-[#9A8C82] mt-1 truncate">{todayDiary.note}</p>
-            )}
+        <button
+          onClick={() => setLocation("/routine")}
+          className="card-warm px-3.5 py-3 text-left transition-all active:scale-[0.97] hover:shadow-md flex items-center gap-3"
+        >
+          <div className="w-9 h-9 rounded-xl bg-[rgba(193,123,92,0.06)] flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round" className="shrink-0 mt-1">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[rgba(193,123,92,0.08)] flex items-center justify-center">
-            <span className="text-[18px]">📝</span>
+          <div className="min-w-0">
+            <p className="font-body text-[13px] text-[#2D2420] font-medium">护肤方案</p>
+            <p className="font-body text-[11px] text-[#B5ADA7]">今日步骤</p>
           </div>
-          <div className="flex-1">
-            <p className="font-body text-[13px] text-[#2D2420] font-medium">记录今日皮肤状态</p>
-            <p className="font-body text-[12px] text-[#9A8C82]">坚持记录，发现皮肤变化规律</p>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          onClick={() => setLocation("/ingredients")}
+          className="card-warm px-3.5 py-3 text-left transition-all active:scale-[0.97] hover:shadow-md flex items-center gap-3"
+        >
+          <div className="w-9 h-9 rounded-xl bg-[rgba(193,123,92,0.06)] flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 3h6v11l-3 3-3-3z" />
+              <path d="M6 14l-3 3v4h18v-4l-3-3" />
+            </svg>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      )}
-    </button>
+          <div className="min-w-0">
+            <p className="font-body text-[13px] text-[#2D2420] font-medium">成分分析</p>
+            <p className="font-body text-[11px] text-[#B5ADA7]">解读成分表</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setLocation("/conflict")}
+          className="card-warm px-3.5 py-3 text-left transition-all active:scale-[0.97] hover:shadow-md flex items-center gap-3"
+        >
+          <div className="w-9 h-9 rounded-xl bg-[rgba(193,123,92,0.06)] flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <div className="min-w-0">
+            <p className="font-body text-[13px] text-[#2D2420] font-medium">冲突检测</p>
+            <p className="font-body text-[11px] text-[#B5ADA7]">产品搭配安全</p>
+          </div>
+        </button>
+      </div>
+    </div>
   );
 
   const InsightBanner = () => {
@@ -251,48 +328,6 @@ export default function Home() {
     );
   };
 
-  const DetectionEntry = () => (
-    <div className="space-y-3">
-      <button
-        onClick={() => setLocation("/chat")}
-        className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
-        style={{
-          background: "linear-gradient(135deg, #C17B5C 0%, #D4956F 100%)",
-          boxShadow: "0 4px 16px rgba(193,123,92,0.25)",
-        }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-          <circle cx="12" cy="13" r="4" />
-        </svg>
-        <div className="flex-1 text-left">
-          <span className="font-body text-[14px] text-white font-medium">AI 皮肤检测</span>
-          <p className="font-body text-[12px] text-white/70">上传照片，30秒出报告</p>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70">
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
-      </button>
-
-      <button
-        onClick={() => setLocation("/chat")}
-        className="w-full flex items-center gap-3 px-5 py-3 rounded-xl transition-all active:scale-[0.98]"
-        style={{
-          background: "rgba(237,232,224,0.6)",
-          border: "1px solid rgba(45,36,32,0.05)",
-        }}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-        <span className="font-body text-[13px] text-[#7A6E68]">和芯颜 AI 聊聊护肤问题</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round" className="ml-auto">
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
-      </button>
-    </div>
-  );
-
   const TipCard = () => (
     <div
       className="rounded-xl px-4 py-3.5 flex items-start gap-3"
@@ -309,6 +344,25 @@ export default function Home() {
         <p className="font-body text-[12px] text-[#5A4F49] leading-relaxed">{skinTips[tipIndex]}</p>
       </div>
     </div>
+  );
+
+  const ChatEntry = () => (
+    <button
+      onClick={() => setLocation("/chat")}
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
+      style={{
+        background: "rgba(237,232,224,0.6)",
+        border: "1px solid rgba(45,36,32,0.05)",
+      }}
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+      <span className="font-body text-[13px] text-[#7A6E68]">和芯颜 AI 聊聊护肤问题</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5ADA7" strokeWidth="2" strokeLinecap="round" className="ml-auto">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </button>
   );
 
   return (
@@ -362,30 +416,36 @@ export default function Home() {
           </button>
         </header>
 
-        <div className="px-5 mt-2 anim-fade-up">
+        {/* Hero Detection - TOP PRIORITY */}
+        <div className="mt-2 anim-fade-up">
+          <HeroDetection isMobile />
+        </div>
+
+        {/* Today Overview */}
+        <div className="px-5 mt-4 anim-fade-up d-100">
           <TodayOverview />
         </div>
 
+        {/* Insight */}
         {topInsight && (
-          <div className="px-5 mt-3 anim-fade-up d-100">
+          <div className="px-5 mt-3 anim-fade-up d-150">
             <InsightBanner />
           </div>
         )}
 
-        <div className="px-5 mt-4 anim-fade-up d-150">
-          <p className="font-body text-[12px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">快捷功能</p>
-          <QuickActions />
-        </div>
-
+        {/* Quick Tools */}
         <div className="px-5 mt-4 anim-fade-up d-200">
-          <DiaryCard />
+          <p className="font-body text-[12px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">护肤工具</p>
+          <QuickTools />
         </div>
 
-        <div className="px-5 mt-4 anim-fade-up d-250">
-          <DetectionEntry />
+        {/* Chat Entry */}
+        <div className="px-5 mt-3 anim-fade-up d-250">
+          <ChatEntry />
         </div>
 
-        <div className="px-5 mt-4 anim-fade-up d-300">
+        {/* Tip */}
+        <div className="px-5 mt-3 anim-fade-up d-300">
           <TipCard />
         </div>
 
@@ -441,8 +501,37 @@ export default function Home() {
         </header>
 
         <main className="flex-1 flex overflow-hidden">
-          {/* Left Column */}
-          <div className="w-[45%] overflow-y-auto px-8 lg:px-12 py-6 space-y-5">
+          {/* Left Column - Hero Detection */}
+          <div className="w-[50%] overflow-y-auto px-8 lg:px-12 py-6 space-y-5">
+            <div className="anim-fade-up">
+              <HeroDetection />
+            </div>
+
+            {/* Hero image card */}
+            <div className="anim-fade-up d-100 rounded-2xl overflow-hidden relative" style={{ height: 200 }}>
+              <img
+                src={HERO_IMAGE}
+                alt="芯颜AI"
+                className="w-full h-full object-cover"
+                style={{ filter: "brightness(1.02)" }}
+              />
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(45,36,32,0.5), transparent)" }} />
+              <div className="absolute bottom-4 left-5 right-5">
+                <p className="font-display text-[1.1rem] text-white">芯颜 AI · 你的护肤伴侣</p>
+                <p className="font-body text-[12px] text-white/70 mt-0.5">专业皮肤分析，科学护肤指导</p>
+              </div>
+            </div>
+
+            {/* Chat entry */}
+            <div className="anim-fade-up d-200">
+              <ChatEntry />
+            </div>
+          </div>
+
+          <div className="w-px bg-[rgba(45,36,32,0.06)]" />
+
+          {/* Right Column - Overview + Tools */}
+          <div className="flex-1 overflow-y-auto px-8 lg:px-12 py-6 space-y-5">
             <div className="anim-fade-up">
               <TodayOverview />
             </div>
@@ -454,46 +543,18 @@ export default function Home() {
             )}
 
             <div className="anim-fade-up d-200">
-              <DiaryCard />
+              <p className="font-body text-[12px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">护肤工具</p>
+              <QuickTools />
             </div>
 
             <div className="anim-fade-up d-300">
               <TipCard />
             </div>
           </div>
-
-          <div className="w-px bg-[rgba(45,36,32,0.06)]" />
-
-          {/* Right Column */}
-          <div className="flex-1 overflow-y-auto px-8 lg:px-12 py-6 space-y-5">
-            <div className="anim-fade-up d-100">
-              <p className="font-body text-[12px] text-[#B5ADA7] tracking-wider mb-2.5 uppercase">快捷功能</p>
-              <QuickActions />
-            </div>
-
-            <div className="anim-fade-up d-200">
-              <DetectionEntry />
-            </div>
-
-            {/* Hero image card */}
-            <div className="anim-fade-up d-300 rounded-2xl overflow-hidden relative" style={{ height: 200 }}>
-              <img
-                src={HERO_IMAGE}
-                alt="芯颜AI"
-                className="w-full h-full object-cover"
-                style={{ filter: "brightness(1.02)" }}
-              />
-              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(45,36,32,0.5), transparent)" }} />
-              <div className="absolute bottom-4 left-5 right-5">
-                <p className="font-display text-[1.1rem] text-white">芯颜 AI · 你的护肤伴侣</p>
-                <p className="font-body text-[12px] text-white/70 mt-0.5">每天记录，每天进步</p>
-              </div>
-            </div>
-          </div>
         </main>
 
         <footer className="relative z-10 flex items-center justify-between px-8 lg:px-12 py-3" style={{ borderTop: "1px solid rgba(193,123,92,0.06)" }}>
-          <p className="font-body text-[12px] text-[#B5ADA7]">© 2025 芯颜 AI · 你的每日护肤伴侣</p>
+          <p className="font-body text-[12px] text-[#B5ADA7]">© 2025 芯颜 AI · 专业皮肤智能分析</p>
           <div className="flex items-center gap-4">
             <button onClick={() => setLocation("/discover")} className="font-body text-[12px] text-[#B5ADA7] hover:text-[#C17B5C] transition-colors">
               护肤知识

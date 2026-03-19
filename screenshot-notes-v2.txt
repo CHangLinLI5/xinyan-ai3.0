@@ -1,0 +1,17 @@
+Desktop Home v2 - Detection-centric layout:
+
+LEFT COLUMN:
+1. Hero Detection CTA - Large gradient card with camera icon, "AI 皮肤检测" title, description, "拍照检测" + "30秒出报告" badges. Very prominent. ✅
+2. Hero image card - Face photo with "芯颜 AI · 你的护肤伴侣" overlay. ✅
+3. Chat entry button - "和芯颜 AI 聊聊护肤问题". ✅
+
+RIGHT COLUMN:
+1. Today Overview card - Date, greeting, routine progress, streak. ✅
+2. Insight banner - "连续3天出现出油". ✅
+3. Quick Tools grid - 4 tools (皮肤日记, 护肤方案, 成分分析, 冲突检测) with SVG icons. ✅
+4. Tip card. ✅
+
+Top nav: 日记, 方案, 发现, 个人中心 + AI检测 button. ✅
+Detection is now clearly the hero/primary action. Other tools are secondary. ✅
+
+Need to check mobile view next.
