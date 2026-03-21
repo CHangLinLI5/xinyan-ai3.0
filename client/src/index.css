@@ -631,3 +631,57 @@ body {
     animation: pulse-dot 2s ease-in-out infinite;
   }
 }
+
+/* ===== Markdown Content Styles ===== */
+.markdown-content {
+  line-height: 1.75;
+}
+
+.markdown-content > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.markdown-content ol {
+  padding-left: 0;
+}
+
+.markdown-content ol li {
+  display: flex;
+  gap: 6px;
+}
+
+.markdown-content ol li::before {
+  content: none;
+}
+
+/* ===== Desktop Layout Enhancements ===== */
+@media (min-width: 768px) {
+  .markdown-content p {
+    font-size: 14px;
+  }
+
+  .markdown-content li {
+    font-size: 13.5px;
+  }
+
+  .markdown-content h1 {
+    font-size: 1.25rem;
+  }
+
+  .markdown-content h2 {
+    font-size: 1.1rem;
+  }
+
+  .markdown-content h3 {
+    font-size: 0.95rem;
+  }
+}

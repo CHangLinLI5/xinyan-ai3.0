@@ -118,7 +118,7 @@ export default function Result() {
   return (
     <div className="page-locked flex flex-col">
       {/* Header - glassmorphism */}
-      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] z-10 shrink-0"
+      <header className="flex items-center justify-between px-5 md:px-8 py-3 md:py-4 border-b border-[rgba(45,36,32,0.06)] z-10 shrink-0"
         style={{
           background: "rgba(242,237,230,0.85)",
           backdropFilter: "blur(20px) saturate(180%)",
@@ -351,7 +351,7 @@ export default function Result() {
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Left: Score Panel */}
-        <div className="w-[340px] lg:w-[380px] shrink-0 flex flex-col items-center justify-center px-6 border-r border-[rgba(45,36,32,0.06)]">
+        <div className="w-[340px] lg:w-[400px] xl:w-[440px] shrink-0 flex flex-col items-center justify-center px-6 lg:px-8 border-r border-[rgba(45,36,32,0.06)]">
           <div className="text-center anim-scale-in">
             <div className="flex items-baseline justify-center gap-1 mb-3">
               <span className="font-display text-[clamp(3rem,8vw,5.5rem)] font-light leading-none text-clay-gradient">
@@ -413,7 +413,7 @@ export default function Result() {
 
         {/* Right: Detail Tabs */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex border-b border-[rgba(45,36,32,0.06)] px-5">
+          <div className="flex border-b border-[rgba(45,36,32,0.06)] px-5 lg:px-8">
             {tabs.map((tab, i) => (
               <button
                 key={tab}
@@ -432,11 +432,11 @@ export default function Result() {
             ))}
           </div>
 
-          <div className="flex-1 overflow-y-auto px-5 py-5">
+          <div className="flex-1 overflow-y-auto px-5 lg:px-8 py-5 lg:py-6">
             {activeTab === 0 && (
-              <div className="space-y-4 max-w-2xl">
+              <div className="space-y-4 max-w-3xl">
                 {record.metrics.map((m, i) => (
-                  <div key={i} className="card-warm p-4 anim-fade-up" style={{ animationDelay: `${i * 0.08}s` }}>
+                  <div key={i} className="card-warm p-4 lg:p-5 anim-fade-up" style={{ animationDelay: `${i * 0.08}s` }}>
                     <div className="flex items-center justify-between mb-2">
                       <span className="label-sm">{m.label}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-body font-medium ${statusStyle(m.status)}`}>
@@ -457,7 +457,7 @@ export default function Result() {
             )}
 
             {activeTab === 1 && (
-              <div className="space-y-6 max-w-2xl">
+              <div className="space-y-6 max-w-3xl">
                 {record.advice.map((a, i) => (
                   <div key={i} className="flex gap-5 anim-fade-up" style={{ animationDelay: `${i * 0.1}s` }}>
                     <span className="font-display text-[2.75rem] font-light text-[rgba(193,123,92,0.25)] leading-none shrink-0 w-16 text-right">
@@ -475,7 +475,7 @@ export default function Result() {
             )}
 
             {activeTab === 2 && (
-              <div className="max-w-2xl">
+              <div className="max-w-3xl">
                 <div className="relative rounded-xl overflow-hidden mb-5 anim-fade-up" style={{ height: 200 }}>
                   <img src={PRODUCT_HERO} alt="推荐产品" className="w-full h-full object-cover" />
                   <div

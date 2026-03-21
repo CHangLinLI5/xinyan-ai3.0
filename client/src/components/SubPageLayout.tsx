@@ -47,8 +47,8 @@ export default function SubPageLayout({
         }}
       />
 
-      {/* Header */}
-      <header className="flex items-center gap-3 px-5 md:px-8 pt-[env(safe-area-inset-top,12px)] pb-2 max-w-2xl mx-auto w-full anim-fade-in">
+      {/* Header (mobile only when sidebar is present) */}
+      <header className="flex md:hidden items-center gap-3 px-5 pt-[env(safe-area-inset-top,12px)] pb-2 max-w-2xl mx-auto w-full anim-fade-in">
         {showBack ? (
           <button
             onClick={() => setLocation(backTo)}
@@ -72,14 +72,14 @@ export default function SubPageLayout({
       </header>
 
       {/* Title with accent bar */}
-      <div className="max-w-2xl mx-auto px-5 md:px-8 mt-3 anim-slide-up">
+      <div className="max-w-2xl md:max-w-5xl mx-auto px-5 md:px-8 lg:px-12 mt-3 md:mt-6 anim-slide-up">
         <div className="flex items-center gap-3">
           <div
             className="w-1 h-6 rounded-full"
             style={{ background: `linear-gradient(180deg, ${accentColor}, ${accentColor}40)` }}
           />
           <div>
-            <h1 className="font-display text-[1.25rem] text-[#2D2420] leading-tight">{title}</h1>
+            <h1 className="font-display text-[1.25rem] md:text-[1.5rem] text-[#2D2420] leading-tight">{title}</h1>
             {subtitle && (
               <p className="font-body text-[12px] text-[#9A8C82] mt-0.5">{subtitle}</p>
             )}
@@ -88,18 +88,18 @@ export default function SubPageLayout({
       </div>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto px-5 md:px-8 mt-5 anim-slide-up d-100 relative z-10">
+      <main className="max-w-2xl md:max-w-5xl mx-auto px-5 md:px-8 lg:px-12 mt-5 anim-slide-up d-100 relative z-10">
         {children}
       </main>
 
       {/* Bottom spacing */}
       {showTabBar ? (
         <>
-          <div className="pb-tabbar md:pb-8" />
+          <div className="pb-tabbar md:pb-12" />
           <MobileTabBar />
         </>
       ) : (
-        <div className="pb-8" />
+        <div className="pb-8 md:pb-12" />
       )}
     </div>
   );

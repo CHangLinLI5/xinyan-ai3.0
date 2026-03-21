@@ -6,6 +6,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import Logo from "@/components/Logo";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface Message {
   id: string;
@@ -406,7 +407,8 @@ export default function Chat() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
-        .streaming-cursor::after {
+        .streaming-cursor .markdown-content p:last-of-type::after,
+        .streaming-cursor .markdown-content li:last-of-type::after {
           content: "▊";
           display: inline;
           animation: cursor-blink 0.8s ease-in-out infinite;
@@ -434,7 +436,7 @@ export default function Chat() {
       )}
 
       {/* Header - refined with glassmorphism */}
-      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] z-10 shrink-0"
+      <header className="flex items-center justify-between px-5 md:px-8 py-3 md:py-4 border-b border-[rgba(45,36,32,0.06)] z-10 shrink-0"
         style={{
           background: "rgba(242,237,230,0.85)",
           backdropFilter: "blur(20px) saturate(180%)",
@@ -468,7 +470,7 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(110px + env(safe-area-inset-bottom, 0px))" }}>
         {isWelcome ? (
           /* Welcome Screen - Claude style centered */
-          <div className="flex flex-col items-center justify-center h-full px-5 py-8">
+          <div className="flex flex-col items-center justify-center h-full px-5 md:px-8 py-8 md:py-12">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 anim-scale-in"
               style={{
@@ -481,7 +483,7 @@ export default function Chat() {
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
             </div>
-            <h2 className="font-display text-xl font-normal text-[#2D2420] mb-2 anim-fade-up d-100">
+            <h2 className="font-display text-xl md:text-2xl font-normal text-[#2D2420] mb-2 anim-fade-up d-100">
               皮肤智能分析
             </h2>
             <p className="font-body text-sm text-[#7A6E68] text-center max-w-sm mb-2 anim-fade-up d-150" style={{ fontWeight: 300 }}>
@@ -493,7 +495,7 @@ export default function Chat() {
 
             {/* Upload area - cleaner with subtle animation */}
             <div
-              className="w-full max-w-sm rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-300 hover:shadow-lg anim-fade-up d-300"
+              className="w-full max-w-sm md:max-w-md rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-300 hover:shadow-lg anim-fade-up d-300"
               onClick={() => fileInputRef.current?.click()}
               style={{
                 background: "linear-gradient(145deg, #F8F0E8 0%, #F0E4D8 50%, #EBD9CC 100%)",
@@ -518,7 +520,7 @@ export default function Chat() {
             </div>
 
             {/* Agent shortcuts */}
-            <div className="flex gap-2 mt-6 max-w-sm justify-center anim-fade-up d-350">
+            <div className="flex gap-2 md:gap-3 mt-6 max-w-sm md:max-w-md justify-center anim-fade-up d-350">
               {agentShortcuts.map((s) => (
                 <button
                   key={s.path}
@@ -533,12 +535,12 @@ export default function Chat() {
             </div>
 
             {/* Quick questions */}
-            <div className="flex flex-wrap gap-2 mt-4 max-w-sm justify-center anim-fade-up d-400">
+            <div className="flex flex-wrap gap-2 md:gap-3 mt-4 max-w-sm md:max-w-lg justify-center anim-fade-up d-400">
               {quickQuestions.map((q) => (
                 <button
                   key={q}
                   onClick={() => handleQuickQuestion(q)}
-                  className="px-3.5 py-2 rounded-full text-[12px] font-body text-[#7A6E68] transition-all active:scale-[0.96] hover:text-[#C17B5C] hover:border-[rgba(193,123,92,0.2)]"
+                  className="px-3.5 md:px-4 py-2 md:py-2.5 rounded-full text-[12px] md:text-[13px] font-body text-[#7A6E68] transition-all active:scale-[0.96] hover:text-[#C17B5C] hover:border-[rgba(193,123,92,0.2)]"
                   style={{
                     background: "rgba(45,36,32,0.03)",
                     border: "1px solid rgba(45,36,32,0.08)",
@@ -551,7 +553,7 @@ export default function Chat() {
           </div>
         ) : (
           /* Messages - Claude style */
-          <div className="max-w-2xl mx-auto px-4 md:px-6 py-5 space-y-5">
+          <div className="max-w-3xl mx-auto px-4 md:px-8 lg:px-12 py-5 md:py-8 space-y-5 md:space-y-6">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -559,27 +561,25 @@ export default function Chat() {
               >
                 {msg.role === "ai" ? (
                   /* AI Message */
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 md:gap-4">
                     <div
-                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                      className="w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                       style={{ background: "rgba(193,123,92,0.1)" }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="md:w-[16px] md:h-[16px]">
                         <circle cx="12" cy="12" r="3" />
                         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2" />
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
-                      <p className="font-body text-[13.5px] leading-[1.75] text-[#2D2420] whitespace-pre-line" style={{ fontWeight: 350 }}>
-                        {msg.content}
-                      </p>
+                      <MarkdownRenderer content={msg.content} />
                       <p className="font-body text-[11px] text-[#C5BBB3] mt-1.5">{formatTime(msg.timestamp)}</p>
                     </div>
                   </div>
                 ) : (
                   /* User Message */
                   <div className="flex justify-end">
-                    <div className="max-w-[80%] md:max-w-[65%]">
+                    <div className="max-w-[80%] md:max-w-[60%] lg:max-w-[50%]">
                       {msg.image && (
                         <img
                           src={msg.image}
@@ -589,13 +589,13 @@ export default function Chat() {
                         />
                       )}
                       <div
-                        className="px-4 py-3 rounded-[20px] rounded-br-[6px]"
+                        className="px-4 md:px-5 py-3 md:py-3.5 rounded-[20px] rounded-br-[6px]"
                         style={{
                           background: "linear-gradient(135deg, #C17B5C 0%, #D08B6A 100%)",
                           boxShadow: "0 2px 8px rgba(193,123,92,0.2)",
                         }}
                       >
-                        <p className="font-body text-[13.5px] leading-[1.6] text-white whitespace-pre-line" style={{ fontWeight: 350 }}>
+                        <p className="font-body text-[13.5px] md:text-[14px] leading-[1.6] text-white whitespace-pre-line" style={{ fontWeight: 350 }}>
                           {msg.content}
                         </p>
                       </div>
@@ -639,9 +639,9 @@ export default function Chat() {
                 </div>
                 <div className="flex-1 min-w-0 pt-0.5">
                   {streamingContent ? (
-                    <p className="font-body text-[13.5px] leading-[1.75] text-[#2D2420] whitespace-pre-line streaming-cursor" style={{ fontWeight: 350 }}>
-                      {streamingContent}
-                    </p>
+                    <div className="streaming-cursor">
+                      <MarkdownRenderer content={streamingContent} />
+                    </div>
                   ) : (
                     <TypingIndicator />
                   )}
@@ -729,11 +729,11 @@ export default function Chat() {
           paddingTop: "24px",
         }}
       >
-        <div className="max-w-2xl mx-auto px-4 md:px-6"
+        <div className="max-w-3xl mx-auto px-4 md:px-8 lg:px-12"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)" }}>
           {/* Input box */}
           <div
-            className="flex items-end gap-2 px-3 py-2 rounded-2xl transition-all"
+            className="flex items-end gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-2xl md:rounded-[20px] transition-all"
             style={{
               background: "rgba(255,255,255,0.85)",
               border: "1px solid rgba(45,36,32,0.1)",
@@ -775,7 +775,7 @@ export default function Chat() {
               onKeyDown={handleKeyDown}
               placeholder={fromResult ? "针对报告提问..." : "输入皮肤问题，或上传照片分析..."}
               rows={1}
-              className="flex-1 resize-none py-2 font-body text-[14px] bg-transparent focus:outline-none placeholder:text-[#C5BBB3] text-[#2D2420] leading-relaxed"
+              className="flex-1 resize-none py-2 font-body text-[14px] md:text-[15px] bg-transparent focus:outline-none placeholder:text-[#C5BBB3] text-[#2D2420] leading-relaxed"
               style={{ fontWeight: 350, maxHeight: "120px" }}
               disabled={isStreaming}
             />
@@ -794,7 +794,7 @@ export default function Chat() {
               <button
                 onClick={handleSend}
                 disabled={!inputText.trim()}
-                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 mb-0.5 disabled:opacity-30"
+                className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-all shrink-0 mb-0.5 disabled:opacity-30"
                 style={{
                   background: inputText.trim() ? "linear-gradient(135deg, #C17B5C, #D4956F)" : "rgba(45,36,32,0.06)",
                 }}
@@ -808,7 +808,7 @@ export default function Chat() {
           </div>
 
           {/* Disclaimer */}
-          <p className="text-center font-body text-[11px] text-[#C5BBB3] mt-2 mb-1 leading-relaxed" style={{ fontWeight: 300 }}>
+          <p className="text-center font-body text-[11px] md:text-[12px] text-[#C5BBB3] mt-2 mb-1 leading-relaxed" style={{ fontWeight: 300 }}>
             芯颜 AI 由 GPT-5.4 驱动，分析结果仅供参考，不构成医疗建议
           </p>
         </div>

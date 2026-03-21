@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import DesktopLayout from "./components/DesktopLayout";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Result from "./pages/Result";
@@ -17,21 +18,39 @@ import Ingredients from "./pages/Ingredients";
 import Conflict from "./pages/Conflict";
 import Discover from "./pages/Discover";
 
+/* Pages that use the desktop sidebar layout */
+function WithSidebar({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <DesktopLayout>
+      <Component />
+    </DesktopLayout>
+  );
+}
+
+/* Pages that are full-screen (no sidebar on desktop) */
+function FullScreen({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <DesktopLayout hideSidebar>
+      <Component />
+    </DesktopLayout>
+  );
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/chat" component={Chat} />
-      <Route path="/result" component={Result} />
-      <Route path="/calendar" component={Calendar} />
-      <Route path="/history" component={History} />
-      <Route path="/profile" component={Profile} />
+      <Route path="/">{() => <WithSidebar component={Home} />}</Route>
+      <Route path="/chat">{() => <FullScreen component={Chat} />}</Route>
+      <Route path="/result">{() => <FullScreen component={Result} />}</Route>
+      <Route path="/calendar">{() => <WithSidebar component={Calendar} />}</Route>
+      <Route path="/history">{() => <WithSidebar component={History} />}</Route>
+      <Route path="/profile">{() => <WithSidebar component={Profile} />}</Route>
       <Route path="/login" component={Login} />
-      <Route path="/diary" component={Diary} />
-      <Route path="/routine" component={Routine} />
-      <Route path="/ingredients" component={Ingredients} />
-      <Route path="/conflict" component={Conflict} />
-      <Route path="/discover" component={Discover} />
+      <Route path="/diary">{() => <WithSidebar component={Diary} />}</Route>
+      <Route path="/routine">{() => <WithSidebar component={Routine} />}</Route>
+      <Route path="/ingredients">{() => <WithSidebar component={Ingredients} />}</Route>
+      <Route path="/conflict">{() => <WithSidebar component={Conflict} />}</Route>
+      <Route path="/discover">{() => <WithSidebar component={Discover} />}</Route>
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
