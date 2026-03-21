@@ -57,6 +57,11 @@ export default function Profile() {
   const handleClearData = useCallback(() => {
     clearAllData();
     clearAgentData();
+    // Clear AI analysis results
+    try {
+      localStorage.removeItem("xinyan-analysis-result");
+      localStorage.removeItem("xinyan-saved-report");
+    } catch {}
     setProfile(getProfile());
     setShowClearConfirm(false);
     toast.success("所有数据已清除");

@@ -1,19 +1,11 @@
 /*
  * Chat.tsx — 检测对话页
  * Design: Warm Ivory Minimalism + Claude-style fluid dialog
- * 
- * Claude 风格特点：
- * - AI 消息无气泡边框，直接文字排列，更开阔
- * - 用户消息用柔和圆角气泡
- * - 打字指示器（三个跳动圆点）
- * - 消息渐入动画（从下方滑入 + 淡入）
- * - 输入框更大更圆润，类似搜索框
- * - 底部免责声明
+ * Backend: Connected to GPT-5.4 via /api/chat (streaming SSE)
  */
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import Logo from "@/components/Logo";
-// MobileTabBar removed per Ch3.1 - Chat is immersive experience
 
 interface Message {
   id: string;
@@ -41,6 +33,7 @@ const quickQuestions = [
   "我的皮肤适合什么护肤品？",
   "如何改善毛孔粗大？",
   "敏感肌日常护理建议",
+  "换季皮肤过敏怎么办？",
 ];
 
 const agentShortcuts = [
@@ -59,18 +52,86 @@ const resultFollowUps = [
 /* Typing indicator - three bouncing dots */
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1 py-2 px-1">
+    <div className="flex items-center gap-1.5 py-2 px-1">
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="w-[6px] h-[6px] rounded-full bg-[#C17B5C] opacity-60"
+          className="w-[6px] h-[6px] rounded-full bg-[#C17B5C]"
           style={{
-            animation: `typing-bounce 1.2s ease-in-out ${i * 0.15}s infinite`,
+            animation: `typing-bounce 1.4s ease-in-out ${i * 0.2}s infinite`,
           }}
         />
       ))}
     </div>
   );
+}
+
+/* Stream AI response from backend */
+async function streamChat(
+  messages: { role: string; content: string }[],
+  onChunk: (text: string) => void,
+  onDone: () => void,
+  onError: (err: string) => void,
+  abortSignal?: AbortSignal
+) {
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages }),
+      signal: abortSignal,
+    });
+
+    if (!response.ok) {
+      onError("AI 服务暂时不可用，请稍后再试");
+      return;
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      onError("无法读取响应");
+      return;
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("data: ")) {
+          const data = trimmed.slice(6);
+          if (data === "[DONE]") {
+            onDone();
+            return;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.content) {
+              onChunk(parsed.content);
+            }
+            if (parsed.error) {
+              onError(parsed.error);
+              return;
+            }
+          } catch {
+            // skip
+          }
+        }
+      }
+    }
+    onDone();
+  } catch (err: any) {
+    if (err.name === "AbortError") return;
+    onError("网络连接失败，请检查网络后重试");
+  }
 }
 
 export default function Chat() {
@@ -80,13 +141,32 @@ export default function Chat() {
     return new URLSearchParams(window.location.search).get("from") === "result";
   }, []);
 
+  // Load saved analysis result from localStorage for context
+  const savedResult = useMemo(() => {
+    try {
+      const stored = localStorage.getItem("xinyan-analysis-result");
+      return stored ? JSON.parse(stored) : null;
+    } catch { return null; }
+  }, []);
+
   const [messages, setMessages] = useState<Message[]>(() => {
+    if (fromResult && savedResult) {
+      const r = savedResult;
+      return [
+        {
+          id: "welcome-from-result",
+          role: "ai" as const,
+          content: `您好！我已经看过您的皮肤分析报告了 📋\n\n您的综合评分为 ${r.score} 分，${r.summary}\n\n各维度评分：\n${r.metrics?.map((m: any) => `• ${m.label}：${m.score}分（${m.status}）`).join("\n")}\n\n您可以针对任何维度向我提问，我会给出个性化的建议。`,
+          timestamp: Date.now(),
+        },
+      ];
+    }
     if (fromResult) {
       return [
         {
           id: "welcome-from-result",
           role: "ai" as const,
-          content: "您好！我已经看过您的皮肤分析报告了 📋\n\n您的综合评分为 82 分，整体状态良好。其中弹性紧致度表现优秀（91分），水分含量也很充足（88分）。毛孔细腻度（58分）和色素均匀度（65分）还有提升空间。\n\n您可以针对任何维度向我提问，我会给出个性化的建议。",
+          content: "您好！我已经看过您的皮肤分析报告了 📋\n\n您可以针对报告中的任何维度向我提问，我会给出个性化的建议。",
           timestamp: Date.now(),
         },
       ];
@@ -97,10 +177,12 @@ export default function Chat() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(-1);
   const [isDragging, setIsDragging] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -108,7 +190,7 @@ export default function Chat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping, scrollToBottom]);
+  }, [messages, isStreaming, streamingContent, scrollToBottom]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -134,37 +216,82 @@ export default function Chat() {
     ]);
   }, []);
 
-  const addAIMessageWithTyping = useCallback(
-    (content: string, delay = 800) => {
-      setIsTyping(true);
-      setTimeout(() => {
-        setIsTyping(false);
-        addMessage("ai", content);
-      }, delay);
+  // Send message to AI with streaming
+  const sendToAI = useCallback(
+    (userMessages: { role: string; content: string }[]) => {
+      setIsStreaming(true);
+      setStreamingContent("");
+
+      // Abort previous request
+      if (abortRef.current) abortRef.current.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      let accumulated = "";
+
+      streamChat(
+        userMessages,
+        (chunk) => {
+          accumulated += chunk;
+          setStreamingContent(accumulated);
+        },
+        () => {
+          setIsStreaming(false);
+          if (accumulated.trim()) {
+            addMessage("ai", accumulated.trim());
+          }
+          setStreamingContent("");
+        },
+        (err) => {
+          setIsStreaming(false);
+          addMessage("ai", err || "抱歉，我暂时无法回答。请稍后再试。");
+          setStreamingContent("");
+        },
+        controller.signal
+      );
     },
     [addMessage]
   );
 
-  const runAnalysis = useCallback(() => {
-    setIsAnalyzing(true);
-    setAnalysisStep(0);
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      if (step < 5) {
-        setAnalysisStep(step);
-      } else {
-        clearInterval(interval);
-        setAnalysisStep(5);
-        setTimeout(() => {
-          addMessage("ai", "✅ 分析完成！正在为您生成详细报告...");
-          setTimeout(() => {
-            setLocation("/result");
-          }, 1400);
-        }, 600);
-      }
-    }, 800);
-  }, [addMessage, setLocation]);
+  const runAnalysis = useCallback(
+    (description?: string) => {
+      setIsAnalyzing(true);
+      setAnalysisStep(0);
+      let step = 0;
+
+      // Call analyze API in background
+      const analyzePromise = fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: description || "" }),
+      }).then((r) => r.json());
+
+      const interval = setInterval(() => {
+        step++;
+        if (step < 5) {
+          setAnalysisStep(step);
+        } else {
+          clearInterval(interval);
+          setAnalysisStep(5);
+          // Wait for analysis result
+          analyzePromise
+            .then((result) => {
+              // Save result to localStorage for Result page
+              localStorage.setItem("xinyan-analysis-result", JSON.stringify(result));
+              addMessage("ai", "✅ 分析完成！正在为您生成详细报告...");
+              setTimeout(() => {
+                setLocation("/result");
+              }, 1200);
+            })
+            .catch(() => {
+              addMessage("ai", "分析过程中出现了问题，请重新尝试。");
+              setIsAnalyzing(false);
+            });
+        }
+      }, 900);
+    },
+    [addMessage, setLocation]
+  );
 
   const handleImageUpload = useCallback(
     (file: File) => {
@@ -174,45 +301,46 @@ export default function Chat() {
         const dataUrl = e.target?.result as string;
         addMessage("user", "请帮我分析一下皮肤状态", dataUrl);
         setTimeout(() => {
-          addAIMessageWithTyping("收到您的照片，正在进行 AI 皮肤分析...", 600);
-          setTimeout(() => runAnalysis(), 1400);
-        }, 400);
+          addMessage("ai", "收到您的照片，正在进行 AI 皮肤分析...");
+          setTimeout(() => runAnalysis(), 800);
+        }, 600);
       };
       reader.readAsDataURL(file);
     },
-    [addMessage, addAIMessageWithTyping, runAnalysis]
+    [addMessage, runAnalysis]
   );
 
   const handleSend = useCallback(() => {
-    if (!inputText.trim()) return;
-    addMessage("user", inputText.trim());
+    if (!inputText.trim() || isStreaming) return;
+    const text = inputText.trim();
+    addMessage("user", text);
     setInputText("");
-    // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
-    addAIMessageWithTyping(
-      "感谢您的提问！建议您先上传一张面部照片，我可以为您进行专业的皮肤分析，然后根据分析结果给出更精准的建议。您也可以直接描述您的皮肤问题，我会尽力帮助您。",
-      1000
-    );
-  }, [inputText, addMessage, addAIMessageWithTyping]);
+
+    // Build conversation history for API
+    const conversationHistory = [
+      ...messages.map((m) => ({ role: m.role === "ai" ? "assistant" : "user", content: m.content })),
+      { role: "user", content: text },
+    ];
+
+    sendToAI(conversationHistory);
+  }, [inputText, isStreaming, addMessage, messages, sendToAI]);
 
   const handleQuickQuestion = useCallback(
     (q: string) => {
+      if (isStreaming) return;
       addMessage("user", q);
-      if (fromResult) {
-        addAIMessageWithTyping(
-          "根据您的皮肤分析报告，我建议：\n\n1. 针对毛孔问题，每周使用 1-2 次含水杨酸的清洁面膜\n2. 日常使用含烟酰胺的精华液，帮助收缩毛孔并均匀肤色\n3. 保持现有的补水习惯，您的水分含量评分很好\n\n需要我推荐具体的产品吗？",
-          1200
-        );
-      } else {
-        addAIMessageWithTyping(
-          "这是一个很好的问题！为了给您更精准的建议，建议您先上传一张面部照片进行皮肤分析。分析完成后，我可以根据您的具体皮肤状况提供个性化的护理方案。",
-          1000
-        );
-      }
+
+      const conversationHistory = [
+        ...messages.map((m) => ({ role: m.role === "ai" ? "assistant" : "user", content: m.content })),
+        { role: "user", content: q },
+      ];
+
+      sendToAI(conversationHistory);
     },
-    [addMessage, addAIMessageWithTyping, fromResult]
+    [addMessage, messages, sendToAI, isStreaming]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -240,8 +368,21 @@ export default function Chat() {
     [handleSend]
   );
 
+  // Stop streaming
+  const handleStop = useCallback(() => {
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
+    if (streamingContent.trim()) {
+      addMessage("ai", streamingContent.trim());
+    }
+    setIsStreaming(false);
+    setStreamingContent("");
+  }, [streamingContent, addMessage]);
+
   const isWelcome = messages.length === 0 && !isAnalyzing;
-  const showFollowUps = fromResult && messages.length === 1;
+  const showFollowUps = fromResult && messages.length === 1 && !isStreaming;
 
   return (
     <div
@@ -253,14 +394,26 @@ export default function Chat() {
       {/* Typing animation keyframes */}
       <style>{`
         @keyframes typing-bounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-          30% { transform: translateY(-4px); opacity: 0.9; }
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+          30% { transform: translateY(-5px); opacity: 1; }
         }
         @keyframes msg-enter {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .msg-new { animation: msg-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes cursor-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        .streaming-cursor::after {
+          content: "▊";
+          display: inline;
+          animation: cursor-blink 0.8s ease-in-out infinite;
+          color: #C17B5C;
+          font-size: 13px;
+          margin-left: 1px;
+        }
       `}</style>
 
       {/* Drag overlay */}
@@ -280,18 +433,29 @@ export default function Chat() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] bg-[rgba(242,237,230,0.8)] backdrop-blur-sm z-10 shrink-0">
+      {/* Header - refined with glassmorphism */}
+      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(45,36,32,0.06)] z-10 shrink-0"
+        style={{
+          background: "rgba(242,237,230,0.85)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        }}>
         <button
           onClick={() => setLocation(fromResult ? "/result" : "/")}
-          className="flex items-center gap-1 font-body text-sm text-[#7A6E68] hover:text-[#C17B5C] transition-colors"
+          className="flex items-center gap-1.5 font-body text-sm text-[#7A6E68] hover:text-[#C17B5C] transition-colors active:scale-95"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
           {fromResult ? "报告" : "返回"}
         </button>
-        <Logo size="sm" />
+        <div className="flex items-center gap-2">
+          <Logo size="sm" />
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            <span className="font-body text-[11px] text-[#9A8C82]">GPT-5.4</span>
+          </div>
+        </div>
         <button
           onClick={() => setLocation("/result")}
           className="font-body text-sm text-[#C17B5C] hover:text-[#D4967A] transition-colors"
@@ -301,17 +465,18 @@ export default function Chat() {
       </header>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(100px + env(safe-area-inset-bottom, 0px))" }}>
+      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(110px + env(safe-area-inset-bottom, 0px))" }}>
         {isWelcome ? (
           /* Welcome Screen - Claude style centered */
           <div className="flex flex-col items-center justify-center h-full px-5 py-8">
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 anim-scale-in"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 anim-scale-in"
               style={{
-                background: "linear-gradient(135deg, rgba(193,123,92,0.12) 0%, rgba(193,123,92,0.06) 100%)",
+                background: "linear-gradient(135deg, rgba(193,123,92,0.15) 0%, rgba(193,123,92,0.06) 100%)",
+                boxShadow: "0 4px 20px rgba(193,123,92,0.1)",
               }}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
@@ -319,13 +484,16 @@ export default function Chat() {
             <h2 className="font-display text-xl font-normal text-[#2D2420] mb-2 anim-fade-up d-100">
               皮肤智能分析
             </h2>
-            <p className="font-body text-sm text-[#7A6E68] text-center max-w-sm mb-8 anim-fade-up d-200" style={{ fontWeight: 300 }}>
-              上传一张面部照片，AI 将为您进行专业的皮肤状态分析
+            <p className="font-body text-sm text-[#7A6E68] text-center max-w-sm mb-2 anim-fade-up d-150" style={{ fontWeight: 300 }}>
+              上传面部照片获取 AI 专业分析，或直接咨询护肤问题
+            </p>
+            <p className="font-body text-[11px] text-[#B5ADA7] mb-8 anim-fade-up d-150">
+              Powered by GPT-5.4
             </p>
 
-            {/* Upload area - cleaner */}
+            {/* Upload area - cleaner with subtle animation */}
             <div
-              className="w-full max-w-sm rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform anim-fade-up d-300"
+              className="w-full max-w-sm rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-300 hover:shadow-lg anim-fade-up d-300"
               onClick={() => fileInputRef.current?.click()}
               style={{
                 background: "linear-gradient(145deg, #F8F0E8 0%, #F0E4D8 50%, #EBD9CC 100%)",
@@ -342,7 +510,7 @@ export default function Chat() {
                 </div>
                 <p className="font-body text-[14px] font-medium text-[#2D2420] mb-1">上传面部照片</p>
                 <p className="font-body text-[12px] text-[#9A8C82]">正面清晰照 · JPG / PNG</p>
-                <div className="mt-4 px-4 py-2 rounded-full"
+                <div className="mt-4 px-5 py-2.5 rounded-full transition-all hover:shadow-md"
                   style={{ background: "rgba(193,123,92,0.12)", border: "1px solid rgba(193,123,92,0.18)" }}>
                   <span className="font-body text-[13px] text-[#C17B5C] font-medium">点击选择照片</span>
                 </div>
@@ -355,11 +523,11 @@ export default function Chat() {
                 <button
                   key={s.path}
                   onClick={() => setLocation(s.path)}
-                  className="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl transition-all active:scale-[0.96] hover:shadow-sm"
+                  className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl transition-all active:scale-[0.96] hover:shadow-sm hover:-translate-y-0.5"
                   style={{ background: "rgba(237,232,224,0.6)", border: "1px solid rgba(45,36,32,0.05)" }}
                 >
                   <span className="text-[18px]">{s.icon}</span>
-                  <span className="font-body text-[12px] text-[#7A6E68]">{s.label}</span>
+                  <span className="font-body text-[11px] text-[#7A6E68] font-medium">{s.label}</span>
                 </button>
               ))}
             </div>
@@ -370,7 +538,7 @@ export default function Chat() {
                 <button
                   key={q}
                   onClick={() => handleQuickQuestion(q)}
-                  className="px-3.5 py-2 rounded-full text-[12px] font-body text-[#7A6E68] transition-all active:scale-[0.96] hover:text-[#C17B5C]"
+                  className="px-3.5 py-2 rounded-full text-[12px] font-body text-[#7A6E68] transition-all active:scale-[0.96] hover:text-[#C17B5C] hover:border-[rgba(193,123,92,0.2)]"
                   style={{
                     background: "rgba(45,36,32,0.03)",
                     border: "1px solid rgba(45,36,32,0.08)",
@@ -382,7 +550,7 @@ export default function Chat() {
             </div>
           </div>
         ) : (
-          /* Messages - Claude style: AI messages without bubble, user messages with soft bubble */
+          /* Messages - Claude style */
           <div className="max-w-2xl mx-auto px-4 md:px-6 py-5 space-y-5">
             {messages.map((msg) => (
               <div
@@ -390,7 +558,7 @@ export default function Chat() {
                 className={`${msg.isNew ? "msg-new" : ""}`}
               >
                 {msg.role === "ai" ? (
-                  /* AI Message - Claude style: no bubble, clean text with avatar */
+                  /* AI Message */
                   <div className="flex gap-3">
                     <div
                       className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
@@ -402,14 +570,14 @@ export default function Chat() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
-                      <p className="font-body text-[13.5px] leading-[1.7] text-[#2D2420] whitespace-pre-line" style={{ fontWeight: 350 }}>
+                      <p className="font-body text-[13.5px] leading-[1.75] text-[#2D2420] whitespace-pre-line" style={{ fontWeight: 350 }}>
                         {msg.content}
                       </p>
-                      <p className="font-body text-[12px] text-[#C5BBB3] mt-1.5">{formatTime(msg.timestamp)}</p>
+                      <p className="font-body text-[11px] text-[#C5BBB3] mt-1.5">{formatTime(msg.timestamp)}</p>
                     </div>
                   </div>
                 ) : (
-                  /* User Message - soft rounded bubble, right-aligned */
+                  /* User Message */
                   <div className="flex justify-end">
                     <div className="max-w-[80%] md:max-w-[65%]">
                       {msg.image && (
@@ -431,7 +599,7 @@ export default function Chat() {
                           {msg.content}
                         </p>
                       </div>
-                      <p className="font-body text-[12px] text-[#C5BBB3] mt-1.5 text-right">{formatTime(msg.timestamp)}</p>
+                      <p className="font-body text-[11px] text-[#C5BBB3] mt-1.5 text-right">{formatTime(msg.timestamp)}</p>
                     </div>
                   </div>
                 )}
@@ -457,11 +625,11 @@ export default function Chat() {
               </div>
             )}
 
-            {/* Typing indicator */}
-            {isTyping && (
+            {/* Streaming AI response */}
+            {isStreaming && (
               <div className="flex gap-3 msg-new">
                 <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                   style={{ background: "rgba(193,123,92,0.1)" }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C17B5C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -469,7 +637,15 @@ export default function Chat() {
                     <path d="M12 1v2M12 21v2" />
                   </svg>
                 </div>
-                <TypingIndicator />
+                <div className="flex-1 min-w-0 pt-0.5">
+                  {streamingContent ? (
+                    <p className="font-body text-[13.5px] leading-[1.75] text-[#2D2420] whitespace-pre-line streaming-cursor" style={{ fontWeight: 350 }}>
+                      {streamingContent}
+                    </p>
+                  ) : (
+                    <TypingIndicator />
+                  )}
+                </div>
               </div>
             )}
 
@@ -489,7 +665,7 @@ export default function Chat() {
                   <p className="font-body text-[12px] text-[#B5ADA7] mb-3 uppercase tracking-wider">
                     AI 分析进度
                   </p>
-                  {/* Progress Ring (Ch3.3) */}
+                  {/* Progress Ring */}
                   <div className="flex justify-center mb-4">
                     <div className="relative w-16 h-16">
                       <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
@@ -512,11 +688,7 @@ export default function Chat() {
                           <span
                             className="w-5 h-5 rounded-full flex items-center justify-center text-[12px] font-body transition-all duration-300"
                             style={{
-                              background: isDone
-                                ? "#C17B5C"
-                                : isCurrent
-                                ? "rgba(193,123,92,0.2)"
-                                : "rgba(45,36,32,0.06)",
+                              background: isDone ? "#C17B5C" : isCurrent ? "rgba(193,123,92,0.2)" : "rgba(45,36,32,0.06)",
                               color: isDone ? "#FDFAF7" : isCurrent ? "#C17B5C" : "#B5ADA7",
                             }}
                           >
@@ -549,12 +721,12 @@ export default function Chat() {
         )}
       </div>
 
-      {/* Input Area - Claude style: larger, centered, with disclaimer */}
+      {/* Input Area - Claude style */}
       <div
         className="fixed bottom-0 left-0 right-0 z-40"
         style={{
-          background: "linear-gradient(to top, rgba(242,237,230,1) 70%, rgba(242,237,230,0))",
-          paddingTop: "20px",
+          background: "linear-gradient(to top, rgba(242,237,230,1) 75%, rgba(242,237,230,0))",
+          paddingTop: "24px",
         }}
       >
         <div className="max-w-2xl mx-auto px-4 md:px-6"
@@ -563,17 +735,18 @@ export default function Chat() {
           <div
             className="flex items-end gap-2 px-3 py-2 rounded-2xl transition-all"
             style={{
-              background: "rgba(255,255,255,0.8)",
+              background: "rgba(255,255,255,0.85)",
               border: "1px solid rgba(45,36,32,0.1)",
-              boxShadow: "0 2px 12px rgba(45,36,32,0.06), 0 0 0 0px rgba(193,123,92,0)",
+              boxShadow: "0 2px 16px rgba(45,36,32,0.06), 0 0 0 0px rgba(193,123,92,0)",
+              backdropFilter: "blur(10px)",
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = "rgba(193,123,92,0.3)";
-              e.currentTarget.style.boxShadow = "0 2px 16px rgba(45,36,32,0.08), 0 0 0 3px rgba(193,123,92,0.06)";
+              e.currentTarget.style.boxShadow = "0 4px 20px rgba(45,36,32,0.08), 0 0 0 3px rgba(193,123,92,0.06)";
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = "rgba(45,36,32,0.1)";
-              e.currentTarget.style.boxShadow = "0 2px 12px rgba(45,36,32,0.06), 0 0 0 0px rgba(193,123,92,0)";
+              e.currentTarget.style.boxShadow = "0 2px 16px rgba(45,36,32,0.06), 0 0 0 0px rgba(193,123,92,0)";
             }}
           >
             <input
@@ -600,29 +773,43 @@ export default function Chat() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={fromResult ? "针对报告提问..." : "上传照片或输入皮肤问题..."}
+              placeholder={fromResult ? "针对报告提问..." : "输入皮肤问题，或上传照片分析..."}
               rows={1}
               className="flex-1 resize-none py-2 font-body text-[14px] bg-transparent focus:outline-none placeholder:text-[#C5BBB3] text-[#2D2420] leading-relaxed"
               style={{ fontWeight: 350, maxHeight: "120px" }}
+              disabled={isStreaming}
             />
-            <button
-              onClick={handleSend}
-              disabled={!inputText.trim()}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 mb-0.5 disabled:opacity-30"
-              style={{
-                background: inputText.trim() ? "linear-gradient(135deg, #C17B5C, #D4956F)" : "rgba(45,36,32,0.06)",
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={inputText.trim() ? "#FDFAF7" : "#B5ADA7"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="19" x2="12" y2="5" />
-                <polyline points="5 12 12 5 19 12" />
-              </svg>
-            </button>
+            {isStreaming ? (
+              <button
+                onClick={handleStop}
+                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 mb-0.5 hover:bg-[rgba(193,123,92,0.1)]"
+                style={{ background: "rgba(193,123,92,0.06)" }}
+                title="停止生成"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#C17B5C">
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={handleSend}
+                disabled={!inputText.trim()}
+                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 mb-0.5 disabled:opacity-30"
+                style={{
+                  background: inputText.trim() ? "linear-gradient(135deg, #C17B5C, #D4956F)" : "rgba(45,36,32,0.06)",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={inputText.trim() ? "#FDFAF7" : "#B5ADA7"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="19" x2="12" y2="5" />
+                  <polyline points="5 12 12 5 19 12" />
+                </svg>
+              </button>
+            )}
           </div>
 
-          {/* Disclaimer - like ChatGPT/Claude */}
-          <p className="text-center font-body text-[12px] text-[#C5BBB3] mt-2 mb-1 leading-relaxed" style={{ fontWeight: 300 }}>
-            芯颜 AI 的分析结果仅供参考，不构成医疗建议。如有皮肤问题请咨询专业皮肤科医生。
+          {/* Disclaimer */}
+          <p className="text-center font-body text-[11px] text-[#C5BBB3] mt-2 mb-1 leading-relaxed" style={{ fontWeight: 300 }}>
+            芯颜 AI 由 GPT-5.4 驱动，分析结果仅供参考，不构成医疗建议
           </p>
         </div>
       </div>

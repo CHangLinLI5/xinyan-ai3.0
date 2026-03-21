@@ -257,14 +257,17 @@ export default function Home() {
 
                   <div className="flex-1 min-w-0">
                     <h2 className="font-display text-white text-[1.4rem] md:text-[1.6rem] tracking-wide leading-tight">AI 皮肤检测</h2>
-                    <p className="font-body text-white/70 text-[13px] md:text-[14px] mt-2 leading-relaxed">上传面部照片，30秒生成专业分析报告</p>
+                    <p className="font-body text-white/70 text-[13px] md:text-[14px] mt-2 leading-relaxed">上传面部照片，GPT-5.4 驱动的智能分析</p>
                     {/* Pill-shaped tags */}
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-3 flex-wrap">
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-body text-white/90 font-medium" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}>
                         📸 拍照检测
                       </span>
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-body text-white/90 font-medium" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}>
                         ⚡ 30秒出报告
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-body text-white/90 font-medium" style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(4px)" }}>
+                        🤖 GPT-5.4
                       </span>
                     </div>
                   </div>
